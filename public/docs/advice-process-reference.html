@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Erenst Meyer Financial Advisor | Advice Process</title>
+  <meta name="description" content="A professionally presented advice process document for Erenst Meyer Financial Advisor, covering client engagement, onboarding, analysis, recommendations, implementation, and annual reviews." />
+  <style>
+    :root {
+      --bg: #f6f6f4;
+      --paper: #ffffff;
+      --surface: rgba(255, 255, 255, 0.92);
+      --surface-strong: #ffffff;
+      --ink: #2f2f31;
+      --muted: #66676b;
+      --line: #dedee2;
+      --brand: #0a6e8d;
+      --brand-deep: #2f2f31;
+      --accent: #f59a2a;
+      --teal: #6fb7b2;
+      --orange: #f59a2a;
+      --red: #d44a3a;
+      --plum: #8b2d6f;
+      --graphite: #5a5a5d;
+      --accent-soft: rgba(245, 154, 42, 0.12);
+      --success-soft: rgba(10, 110, 141, 0.07);
+      --shadow-lg: 0 24px 60px rgba(20, 20, 24, 0.10);
+      --shadow-sm: 0 10px 30px rgba(20, 20, 24, 0.06);
+      --radius-xl: 30px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --max: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.65;
+      background:
+        radial-gradient(circle at top left, rgba(10, 110, 141, 0.08), transparent 26%),
+        radial-gradient(circle at top right, rgba(245, 154, 42, 0.07), transparent 24%),
+        linear-gradient(180deg, #fbfbfa 0%, var(--bg) 100%);
+    }
+
+    .shell {
+      width: min(calc(100% - 32px), var(--max));
+      margin: 0 auto;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: Georgia, "Times New Roman", serif;
+      line-height: 1.14;
+      margin: 0;
+      color: inherit;
+    }
+
+    p { margin: 0; }
+
+    .hero {
+      padding: 40px 0 24px;
+    }
+
+    .hero-card {
+      position: relative;
+      overflow: hidden;
+      color: #fff;
+      border-radius: 34px;
+      padding: 54px;
+      background:
+        linear-gradient(135deg, rgba(47,47,49,0.98), rgba(58,58,61,0.96) 54%, rgba(74,74,78,0.92) 100%);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .hero-card::before {
+      content: "";
+      position: absolute;
+      top: -120px;
+      right: -80px;
+      width: 320px;
+      height: 320px;
+      background: radial-gradient(circle, rgba(255,255,255,0.14), transparent 68%);
+      pointer-events: none;
+    }
+
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      left: 54px;
+      right: 54px;
+      bottom: 26px;
+      height: 12px;
+      border-radius: 999px;
+      background: linear-gradient(90deg,
+        var(--brand) 0%, var(--brand) 17%,
+        var(--teal) 17%, var(--teal) 34%,
+        var(--orange) 34%, var(--orange) 51%,
+        var(--red) 51%, var(--red) 68%,
+        var(--plum) 68%, var(--plum) 85%,
+        var(--graphite) 85%, var(--graphite) 100%);
+      opacity: 0.95;
+      pointer-events: none;
+    }
+
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      margin-bottom: 18px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.08);
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .brand-lockup {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .brand-name {
+      font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      font-size: clamp(2rem, 5vw, 4.2rem);
+      line-height: 0.95;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: #f3f3f3;
+      font-weight: 300;
+    }
+
+    .brand-name strong {
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .brand-tagline {
+      font-size: 0.98rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.82);
+      font-weight: 600;
+    }
+
+    .brand-legal {
+      font-size: 0.92rem;
+      color: rgba(255,255,255,0.76);
+    }
+
+    h1 {
+      font-size: clamp(2.5rem, 4.6vw, 4.7rem);
+      max-width: 10ch;
+      margin-bottom: 18px;
+    }
+
+    .hero-lead {
+      max-width: 68ch;
+      color: rgba(255,255,255,0.86);
+      font-size: 1.04rem;
+    }
+
+    .owner-card {
+      min-width: 250px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 22px;
+      padding: 18px 18px 16px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .owner-card .label {
+      display: block;
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.65);
+      margin-bottom: 8px;
+    }
+
+    .owner-card strong {
+      display: block;
+      font-size: 1.25rem;
+      margin-bottom: 10px;
+    }
+
+    .owner-card p {
+      color: rgba(255,255,255,0.8);
+      font-size: 0.94rem;
+    }
+
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 28px;
+    }
+
+    .stat {
+      border-radius: 20px;
+      padding: 18px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .stat .label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.64);
+      margin-bottom: 8px;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 1rem;
+      line-height: 1.45;
+    }
+
+    main {
+      padding: 16px 0 68px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 290px minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .toc,
+    .card,
+    .section,
+    .process,
+    .meta,
+    .summary-card {
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,0.8);
+      box-shadow: var(--shadow-sm);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .card,
+    .section {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before,
+    .section::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 8px;
+      background: linear-gradient(90deg,
+        var(--brand) 0%, var(--brand) 17%,
+        var(--teal) 17%, var(--teal) 34%,
+        var(--orange) 34%, var(--orange) 51%,
+        var(--red) 51%, var(--red) 68%,
+        var(--plum) 68%, var(--plum) 85%,
+        var(--graphite) 85%, var(--graphite) 100%);
+    }
+
+    .toc {
+      position: sticky;
+      top: 18px;
+      border-radius: var(--radius-xl);
+      padding: 22px;
+      background: linear-gradient(180deg, rgba(47,47,49,0.96), rgba(66,66,70,0.92));
+      color: #f3f3f3;
+    }
+
+    .toc h2 {
+      font-size: 1.1rem;
+      color: #ffffff;
+      margin-bottom: 14px;
+    }
+
+    .toc ol {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 10px;
+    }
+
+    .toc a {
+      display: block;
+      text-decoration: none;
+      color: rgba(255,255,255,0.9);
+      border-radius: 12px;
+      padding: 10px 12px;
+      border: 1px solid transparent;
+      transition: 160ms ease;
+      font-size: 0.95rem;
+    }
+
+    .toc a:hover,
+    .toc a:focus-visible {
+      background: rgba(255,255,255,0.12);
+      border-color: rgba(255,255,255,0.14);
+      color: #ffffff;
+      outline: none;
+    }
+
+    .content {
+      display: grid;
+      gap: 22px;
+    }
+
+    .card,
+    .section {
+      border-radius: var(--radius-xl);
+      padding: 34px 30px 30px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(250,250,249,0.92));
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .section-kicker {
+      display: inline-block;
+      margin-bottom: 8px;
+      color: var(--red);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+    }
+
+    .section h2,
+    .card h2 {
+      color: var(--brand);
+      font-size: clamp(1.65rem, 2.2vw, 2.28rem);
+      margin-bottom: 8px;
+    }
+
+    .section-summary {
+      max-width: 60ch;
+      color: var(--muted);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      white-space: nowrap;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--brand-deep);
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 22px;
+    }
+
+    .summary-card {
+      border-radius: 18px;
+      padding: 18px;
+      border-top: 4px solid var(--brand);
+      background: linear-gradient(180deg, #ffffff, #f8f8f7);
+    }
+
+    .summary-card h3 {
+      color: var(--brand-deep);
+      font-size: 1rem;
+      margin-bottom: 10px;
+    }
+
+    .summary-card p,
+    .summary-card ul {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin: 0;
+    }
+
+    .summary-card ul {
+      padding-left: 18px;
+    }
+
+    .processes {
+      display: grid;
+      gap: 18px;
+    }
+
+    .process {
+      border-radius: 22px;
+      padding: 24px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(247,247,246,0.94));
+      border: 1px solid var(--line);
+      border-left: 6px solid var(--brand);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.85);
+    }
+
+    .process h3 {
+      color: var(--brand-deep);
+      font-size: 1.22rem;
+      margin-bottom: 12px;
+    }
+
+    .process > p {
+      color: var(--ink);
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .meta {
+      border-radius: 16px;
+      padding: 16px;
+      background: linear-gradient(180deg, #ffffff, #f7f7f6);
+      border: 1px solid #e6ebf1;
+    }
+
+    .meta h4 {
+      font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      color: var(--red);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+
+    .meta p {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .meta strong {
+      color: var(--ink);
+    }
+
+    .footer-note {
+      text-align: center;
+      color: var(--muted);
+      padding: 0 0 48px;
+      font-size: 0.92rem;
+    }
+
+    .footer-note::before {
+      content: "";
+      display: block;
+      width: min(100%, 680px);
+      height: 10px;
+      margin: 0 auto 20px;
+      border-radius: 999px;
+      background: linear-gradient(90deg,
+        var(--brand) 0%, var(--brand) 17%,
+        var(--teal) 17%, var(--teal) 34%,
+        var(--orange) 34%, var(--orange) 51%,
+        var(--red) 51%, var(--red) 68%,
+        var(--plum) 68%, var(--plum) 85%,
+        var(--graphite) 85%, var(--graphite) 100%);
+    }
+
+    @media (max-width: 1080px) {
+      .hero-top,
+      .layout,
+      .summary-grid,
+      .hero-stats,
+      .meta-grid {
+        grid-template-columns: 1fr;
+        display: grid;
+      }
+
+      .toc {
+        position: static;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .hero-card,
+      .card,
+      .section,
+      .process {
+        padding: 22px;
+        border-radius: 24px;
+      }
+
+      .section-header {
+        flex-direction: column;
+      }
+    }
+
+    @media print {
+      body { background: #fff; }
+      .layout { grid-template-columns: 1fr; }
+      .toc { display: none; }
+      .hero-card,
+      .card,
+      .section,
+      .process,
+      .meta,
+      .summary-card {
+        background: #fff;
+        box-shadow: none;
+        border: 1px solid #d7d7d7;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="shell">
+      <section class="hero-card" aria-labelledby="document-title">
+        <div class="hero-top">
+          <div>
+            <div class="eyebrow">Erenst Meyer Financial Advisor</div>
+            <h1 id="document-title">Advice Process</h1>
+            <p class="hero-lead">
+              This document presents the advice process followed by E H Meyer. It reflects a structured,
+              referral-based and review-driven approach designed to deliver a consistent, compliant, and
+              client-focused experience from initial engagement through implementation and ongoing annual review.
+            </p>
+          </div>
+          <aside class="owner-card" aria-label="Document ownership">
+            <span class="label">Process owner</span>
+            <strong>E H Meyer</strong>
+            <p>
+              Prepared as a formal presentation of the current advice workflow for client engagement,
+              analysis, recommendation, implementation, and ongoing servicing.
+            </p>
+          </aside>
+        </div>
+
+        <div class="brand-lockup" aria-label="Erenst Meyer Financial Advisor branding">
+          <div class="brand-name">Erenst Meyer <strong>Financial Advisor</strong></div>
+          <div class="brand-tagline">Personal advice, structured process, long-term support</div>
+          <div class="brand-legal">Broker, product, and compliance context are referenced where relevant on supporting pages and documents.</div>
+        </div>
+
+        <div class="hero-stats" aria-label="Document highlights">
+          <div class="stat">
+            <div class="label">Practice focus</div>
+            <strong>Annual reviews, investments, income plans, and living annuities</strong>
+          </div>
+          <div class="stat">
+            <div class="label">Primary systems</div>
+            <strong>AdviceTech CRM, Beeswax assessment, provider systems, and core communication channels</strong>
+          </div>
+          <div class="stat">
+            <div class="label">Operating model</div>
+            <strong>Referral-led client acquisition with a strong emphasis on ongoing review and servicing</strong>
+          </div>
+        </div>
+      </section>
+    </div>
+  </header>
+
+  <main>
+    <div class="shell layout">
+      <nav class="toc" aria-label="Table of contents">
+        <h2>Contents</h2>
+        <ol>
+          <li><a href="#overview">Overview</a></li>
+          <li><a href="#section-1">1. Establishing the client-planner relationship</a></li>
+          <li><a href="#section-2">2. Gathering client data and goals</a></li>
+          <li><a href="#section-3">3. Analysing the client’s financial position</a></li>
+          <li><a href="#section-4">4. Developing and presenting recommendations</a></li>
+          <li><a href="#section-5">5. Implementing recommendations</a></li>
+          <li><a href="#section-6">6. Monitoring and annual reviews</a></li>
+        </ol>
+      </nav>
+
+      <div class="content">
+        <section class="card" id="overview">
+          <div class="section-header">
+            <div>
+              <span class="section-kicker">Overview</span>
+              <h2>A structured and review-focused advice framework</h2>
+              <p class="section-summary">
+                The process is designed to ensure that each client receives a consistent, professional,
+                and well-documented service experience. The practice is primarily referral-based and review-focused,
+                with particular emphasis on servicing an existing book of investment, income plan, and living annuity clients.
+              </p>
+            </div>
+            <div class="pill">Formal process document</div>
+          </div>
+
+          <div class="summary-grid">
+            <article class="summary-card">
+              <h3>Purpose</h3>
+              <p>To define the end-to-end advice process from first contact through to implementation and ongoing review.</p>
+            </article>
+            <article class="summary-card">
+              <h3>Client focus</h3>
+              <p>Professional engagement, clear communication, documented advice, and proactive annual reviews.</p>
+            </article>
+            <article class="summary-card">
+              <h3>Core systems</h3>
+              <ul>
+                <li>AdviceTech CRM</li>
+                <li>Beeswax assessment</li>
+                <li>Provider systems</li>
+                <li>QuickSign, where required</li>
+              </ul>
+            </article>
+            <article class="summary-card">
+              <h3>Communication channels</h3>
+              <p>Email, telephone, WhatsApp, face-to-face meetings, and Microsoft Teams, as appropriate.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="section" id="section-1">
+          <div class="section-header">
+            <div>
+              <span class="section-kicker">Section 1</span>
+              <h2>Establishing and defining the client-planner relationship</h2>
+              <p class="section-summary">
+                This stage governs first contact, suitability assessment, formal introduction, disclosure,
+                and client acceptance before the advice process proceeds.
+              </p>
+            </div>
+            <div class="pill">3 processes</div>
+          </div>
+
+          <div class="processes">
+            <article class="process">
+              <h3>Referral received and initial contact</h3>
+              <p>
+                New business currently arises predominantly through referrals from existing clients. Once a referral is received,
+                contact is made by telephone, WhatsApp, or email in order to introduce the practice, establish the nature of the enquiry,
+                and determine whether a meeting would be appropriate.
+              </p>
+              <div class="meta-grid">
+                <div class="meta"><h4>Compliance</h4><p>No formal advice is provided at this stage. The purpose of the interaction is limited to determining whether assistance may be offered and whether the matter should proceed. A record of the referral and contact attempt is maintained.</p></div>
+                <div class="meta"><h4>Tools</h4><p>Telephone, WhatsApp, email, diary or calendar, and AdviceTech CRM where appropriate.</p></div>
+                <div class="meta"><h4>Roles and responsibilities</h4><p><strong>E H Meyer:</strong> make initial contact, establish the reason for the enquiry, and assess whether a meeting is warranted. <strong>Client:</strong> explain the reason for engaging and indicate whether they wish to proceed. <strong>Admin support:</strong> assist with scheduling and confirmation where applicable.</p></div>
+                <div class="meta"><h4>Client experience</h4><p>The client receives prompt personal contact and a clear indication of the next step, creating a strong professional first impression.</p></div>
+              </div>
+            </article>
+
+            <article class="process">
+              <h3>Fit assessment and meeting arrangement</h3>
+              <p>
+                Once it has been established that assistance may be provided, an introductory meeting is arranged. The preferred format is face to face,
+                as this generally supports stronger relationship-building and a more effective initial discussion. Where necessary, meetings are held via WhatsApp call or Microsoft Teams.
+                The purpose of the meeting is to introduce the advice process, provide initial documents, and determine whether the client should proceed into formal engagement.
+              </p>
+              <div class="meta-grid">
+                <div class="meta"><h4>Compliance</h4><p>The meeting is positioned as the commencement of the formal engagement process. Initial disclosure and compliance documentation are prepared for presentation.</p></div>
+                <div class="meta"><h4>Tools</h4><p>Face-to-face meetings, WhatsApp call, Microsoft Teams, diary or calendar, and compliance documentation.</p></div>
+                <div class="meta"><h4>Roles and responsibilities</h4><p><strong>E H Meyer:</strong> arrange and attend the meeting, explain the advice process, and determine whether the client may proceed. <strong>Client:</strong> attend the meeting and provide initial information. <strong>Admin support:</strong> confirm meeting details and reminders.</p></div>
+                <div class="meta"><h4>Client experience</h4><p>The client is offered flexibility in how the meeting takes place and is guided clearly through what to expect.</p></div>
+              </div>
+            </article>
+
+            <article class="process">
+              <h3>Initial meeting, disclosure, and client acceptance</h3>
+              <p>
+                During the first formal meeting, the relevant introductory letters and compliance documents are provided,
+                the nature of the advice process is explained, and the required client acceptance checks are completed.
+                This includes the Beeswax assessment and screening for anti-money laundering concerns, sanctions or watchlist matches,
+                and any other factor that may prevent the relationship from proceeding.
+              </p>
+              <div class="meta-grid">
+                <div class="meta"><h4>Compliance</h4><p>This stage includes issue of introductory and compliance documentation, completion of client acceptance checks, and execution of the required screening and risk controls before the advice process continues.</p></div>
+                <div class="meta"><h4>Tools</h4><p>Introductory letters, disclosure documents, Beeswax assessment, compliance screening tools, and meeting notes.</p></div>
+                <div class="meta"><h4>Roles and responsibilities</h4><p><strong>E H Meyer:</strong> explain the process, provide the relevant documents, complete the acceptance assessment, and determine whether the client may proceed. <strong>Client:</strong> review the documentation, ask questions, and provide the information required for screening. <strong>Admin support:</strong> assist with document preparation and filing.</p></div>
+                <div class="meta"><h4>Client experience</h4><p>The client receives a professional explanation of the process and gains confidence that the advice relationship is structured, compliant, and properly governed.</p></div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="section" id="section-2">
+          <div class="section-header">
+            <div>
+              <span class="section-kicker">Section 2</span>
+              <h2>Gathering client data, including goals</h2>
+              <p class="section-summary">
+                Once the client has been accepted, their records, objectives, supporting documentation,
+                and verification requirements are gathered and structured to support sound advice.
+              </p>
+            </div>
+            <div class="pill">3 processes</div>
+          </div>
+
+          <div class="processes">
+            <article class="process">
+              <h3>Client onboarding on AdviceTech</h3>
+              <p>
+                Following acceptance, the client is loaded onto AdviceTech CRM so that all personal details,
+                records, documents, and future interactions are maintained in a structured and consistent manner.
+                This forms the operational foundation of both the advice process and the ongoing review cycle.
+              </p>
+              <div class="meta-grid">
+                <div class="meta"><h4>Compliance</h4><p>Accurate client records must be created and maintained. All documentation and interactions must be captured appropriately on the system.</p></div>
+                <div class="meta"><h4>Tools</h4><p>AdviceTech CRM.</p></div>
+                <div class="meta"><h4>Roles and responsibilities</h4><p><strong>E H Meyer:</strong> capture or oversee the capture of the client’s details on AdviceTech. <strong>Admin support:</strong> assist with data capture, document upload, and record maintenance. <strong>Client:</strong> provide the personal and financial information required for onboarding.</p></div>
+                <div class="meta"><h4>Client experience</h4><p>The client’s information is handled in an orderly and professional manner, supporting efficient future service.</p></div>
+              </div>
+            </article>
+
+            <article class="process">
+              <h3>Establishing the need and gathering financial information</h3>
+              <p>
+                After the client has been loaded on AdviceTech, the specific need is established.
+                This includes identifying why the client has approached the practice, what their goals and priorities are,
+                what financial needs must be addressed, and what their current position looks like.
+                All relevant information and supporting documentation required to understand the case properly are then collected.
+              </p>
+              <div class="meta-grid">
+                <div class="meta"><h4>Compliance</h4><p>The fact-finding process must be sufficiently detailed to support any advice subsequently given. Proper records of all information obtained from the client must be retained.</p></div>
+                <div class="meta"><h4>Tools</h4><p>AdviceTech CRM, fact-find information, client statements, product information, email, telephone, and WhatsApp.</p></div>
+                <div class="meta"><h4>Roles and responsibilities</h4><p><strong>E H Meyer:</strong> establish the client’s need, gather relevant information, and identify required documents. <strong>Client:</strong> provide full and accurate information and supporting documentation. <strong>Admin support:</strong> follow up on outstanding information and documents.</p></div>
+                <div class="meta"><h4>Client experience</h4><p>The client is guided clearly through the information-gathering process and understands the purpose of each requested item.</p></div>
+              </div>
+            </article>
+
+            <article class="process">
+              <h3>Document collection and FICA, where required</h3>
+              <p>
+                All outstanding supporting documentation required for advice and implementation is collected.
+                Where required by the nature of the relationship, provider requirements, or internal compliance process,
+                FICA and related verification requirements are completed. Follow-up is conducted through email, telephone, and WhatsApp until all required documentation has been received.
+              </p>
+              <div class="meta-grid">
+                <div class="meta"><h4>Compliance</h4><p>Required verification and supporting documentation must be obtained and retained where applicable. Outstanding requirements must be tracked and followed up.</p></div>
+                <div class="meta"><h4>Tools</h4><p>AdviceTech CRM, FICA documents, QuickSign where required, email, WhatsApp, telephone, and document checklists.</p></div>
+                <div class="meta"><h4>Roles and responsibilities</h4><p><strong>E H Meyer:</strong> determine which supporting and compliance documents are required and oversee completion. <strong>Admin support:</strong> follow up on outstanding documents and ensure correct capture and filing. <strong>Client:</strong> provide the requested documentation promptly.</p></div>
+                <div class="meta"><h4>Client experience</h4><p>The client remains informed regarding outstanding items and is assisted in completing the process as efficiently as possible.</p></div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="section" id="section-3">
+          <div class="section-header">
+            <div>
+              <span class="section-kicker">Section 3</span>
+              <h2>Analysing and evaluating the client’s financial status</h2>
+              <p class="section-summary">
+                The client’s existing position is reviewed, needs and gaps are identified,
+                and a suitable recommendation is formulated on the basis of the analysis performed.
+              </p>
+            </div>
+            <div class="pill">3 processes</div>
+          </div>
+
+          <div class="processes">
+            <article class="process">
+              <h3>Analysis of current position</h3>
+              <p>
+                Once the relevant information has been collected, the client’s current financial position is analysed.
+                This includes reviewing existing investments, income plans, living annuities, and any other relevant products or planning arrangements.
+                The objective is to determine whether the present position aligns with the client’s needs and whether any adjustment, improvement, or corrective action may be required.
+              </p>
+              <div class="meta-grid">
+                <div class="meta"><h4>Compliance</h4><p>The analysis must be based on the client’s actual circumstances and recorded information. The basis for future recommendations must be supported by the analysis performed.</p></div>
+                <div class="meta"><h4>Tools</h4><p>AdviceTech CRM, provider statements, investment and product information, and financial analysis tools.</p></div>
+                <div class="meta"><h4>Roles and responsibilities</h4><p><strong>E H Meyer:</strong> analyse the existing position and identify planning issues or opportunities. <strong>Client:</strong> clarify uncertainties where necessary. <strong>Admin support:</strong> assist with obtaining updated statements or documents.</p></div>
+                <div class="meta"><h4>Client experience</h4><p>The client benefits from a structured review of their actual position rather than receiving generic or unsupported advice.</p></div>
+              </div>
+            </article>
+
+            <article class="process">
+              <h3>Needs analysis and gap identification</h3>
+              <p>
+                Following the review of the current position, the gap between the client’s present arrangements and their actual needs or objectives is identified.
+                This may involve investment restructuring, income planning considerations, living annuity sustainability assessments,
+                or other financial planning interventions relevant to the client’s circumstances.
+              </p>
+              <div class="meta-grid">
+                <div class="meta"><h4>Compliance</h4><p>The needs analysis must clearly support the recommendations that follow. Records must demonstrate how the recommendation relates directly to the identified need.</p></div>
+                <div class="meta"><h4>Tools</h4><p>AdviceTech CRM, provider information, financial calculations, and product comparison information.</p></div>
+                <div class="meta"><h4>Roles and responsibilities</h4><p><strong>E H Meyer:</strong> identify client needs, shortfalls, and potential solutions. <strong>Client:</strong> confirm objectives and affordability where relevant. <strong>Admin support:</strong> assist with quotations or comparison information where required.</p></div>
+                <div class="meta"><h4>Client experience</h4><p>The client receives advice that is specific to their actual needs and personal circumstances.</p></div>
+              </div>
+            </article>
+
+            <article class="process">
+              <h3>Preparation for recommendation</h3>
+              <p>
+                Based on the outcome of the analysis, the most suitable recommendation or plan is prepared.
+                The recommendation is developed with reference to the client’s objectives, financial situation,
+                and the practicality of implementation.
+              </p>
+              <div class="meta-grid">
+                <div class="meta"><h4>Compliance</h4><p>Recommendations must be suitable, supportable, and properly documented.</p></div>
+                <div class="meta"><h4>Tools</h4><p>AdviceTech CRM, product information, quotations, and recommendation templates.</p></div>
+                <div class="meta"><h4>Roles and responsibilities</h4><p><strong>E H Meyer:</strong> formulate the recommendation and prepare it for presentation to the client. <strong>Admin support:</strong> assist with quotations and supporting documentation where required.</p></div>
+                <div class="meta"><h4>Client experience</h4><p>The client receives a recommendation that is well-considered, relevant, and clearly prepared.</p></div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="section" id="section-4">
+          <div class="section-header">
+            <div>
+              <span class="section-kicker">Section 4</span>
+              <h2>Developing and presenting financial planning recommendations and alternatives</h2>
+              <p class="section-summary">
+                Recommendations are presented clearly, alternative options are addressed where relevant,
+                and client instruction is obtained before implementation is authorised.
+              </p>
+            </div>
+            <div class="pill">3 processes</div>
+          </div>
+
+          <div class="processes">
+            <article class="process">
+              <h3>Proposing the plan</h3>
+              <p>
+                Once the analysis has been completed, the proposed plan is presented to the client.
+                This includes a clear explanation of what is recommended, why the recommendation has been made,
+                and how it addresses the identified need. The relevant product or planning solution,
+                expected outcome, and key considerations are discussed in a professional and comprehensible manner.
+              </p>
+              <div class="meta-grid">
+                <div class="meta"><h4>Compliance</h4><p>The recommendation must be properly recorded and supported. Relevant disclosures and supporting documents form part of the recommendation process.</p></div>
+                <div class="meta"><h4>Tools</h4><p>AdviceTech CRM, recommendation documents, quotations, and supporting schedules.</p></div>
+                <div class="meta"><h4>Roles and responsibilities</h4><p><strong>E H Meyer:</strong> present and explain the recommendation to the client. <strong>Client:</strong> consider the recommendation and raise questions where necessary. <strong>Admin support:</strong> assist with preparation of the advice pack where applicable.</p></div>
+                <div class="meta"><h4>Client experience</h4><p>The recommendation is explained clearly and professionally so that the client understands both the rationale and the next step.</p></div>
+              </div>
+            </article>
+
+            <article class="process">
+              <h3>Discussing alternatives and obtaining client instruction</h3>
+              <p>
+                Where appropriate, alternative options are discussed or the reasons for preferring a particular course of action are explained.
+                Clear client instruction is then obtained regarding whether to proceed with the recommendation.
+                If changes are required, the recommendation is amended accordingly.
+              </p>
+              <div class="meta-grid">
+                <div class="meta"><h4>Compliance</h4><p>Client instructions and the outcome of the advice discussion must be recorded properly. Any decision by the client must be clearly documented.</p></div>
+                <div class="meta"><h4>Tools</h4><p>AdviceTech CRM, meeting notes, email confirmation, QuickSign where required, and signed documentation.</p></div>
+                <div class="meta"><h4>Roles and responsibilities</h4><p><strong>E H Meyer:</strong> explain the recommendation and any alternatives, and obtain clear client instruction. <strong>Client:</strong> decide whether to proceed and confirm any required amendments. <strong>Admin support:</strong> prepare amended documents where needed.</p></div>
+                <div class="meta"><h4>Client experience</h4><p>The client remains involved in the decision-making process and is given sufficient information to make an informed choice.</p></div>
+              </div>
+            </article>
+
+            <article class="process">
+              <h3>Preparing for implementation</h3>
+              <p>
+                Once the client has agreed to proceed, the file is prepared for implementation by ensuring that the recommendation,
+                forms, supporting documentation, and compliance requirements are complete and in order.
+              </p>
+              <div class="meta-grid">
+                <div class="meta"><h4>Compliance</h4><p>No implementation may proceed without the necessary client authority, required documentation, and completed compliance checks.</p></div>
+                <div class="meta"><h4>Tools</h4><p>AdviceTech CRM, provider forms, compliance documents, QuickSign where required, and document checklists.</p></div>
+                <div class="meta"><h4>Roles and responsibilities</h4><p><strong>E H Meyer:</strong> approve the implementation process and confirm readiness. <strong>Admin support:</strong> compile the implementation pack and check for outstanding items. <strong>Client:</strong> sign or provide final required documentation.</p></div>
+                <div class="meta"><h4>Client experience</h4><p>The client experiences a smooth and well-managed transition from advice to implementation.</p></div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="section" id="section-5">
+          <div class="section-header">
+            <div>
+              <span class="section-kicker">Section 5</span>
+              <h2>Implementing the financial planning recommendations</h2>
+              <p class="section-summary">
+                Agreed recommendations are submitted and tracked through to activation,
+                with outstanding requirements managed proactively and final implementation confirmed with the client.
+              </p>
+            </div>
+            <div class="pill">3 processes</div>
+          </div>
+
+          <div class="processes">
+            <article class="process">
+              <h3>Submitting and implementing the plan</h3>
+              <p>
+                The agreed plan is implemented through submission of the relevant applications, instructions, or amendments.
+                Depending on the advice provided, this may include investments, income plans, living annuities,
+                or related transactions.
+              </p>
+              <div class="meta-grid">
+                <div class="meta"><h4>Compliance</h4><p>All implementation must reflect the recommendation agreed to by the client. Submission records and supporting documentation must be retained.</p></div>
+                <div class="meta"><h4>Tools</h4><p>Provider submission systems, AdviceTech CRM, provider forms, QuickSign where required, and email.</p></div>
+                <div class="meta"><h4>Roles and responsibilities</h4><p><strong>E H Meyer:</strong> oversee implementation and ensure that it aligns with the approved recommendation. <strong>Admin support:</strong> submit and track business or instructions. <strong>Client:</strong> provide signatures and final confirmations where required.</p></div>
+                <div class="meta"><h4>Client experience</h4><p>The client is supported through implementation with minimal confusion and minimal unnecessary delay.</p></div>
+              </div>
+            </article>
+
+            <article class="process">
+              <h3>Tracking outstanding requirements and follow-up</h3>
+              <p>
+                Following submission, all outstanding requirements, provider queries, and missing documentation are tracked and followed up until the plan becomes active.
+                This often involves repeated contact through telephone, email, and WhatsApp to prevent avoidable implementation delays.
+              </p>
+              <div class="meta-grid">
+                <div class="meta"><h4>Compliance</h4><p>Outstanding requirements must be monitored and recorded. All follow-up communication should be documented appropriately.</p></div>
+                <div class="meta"><h4>Tools</h4><p>AdviceTech CRM, telephone, email, WhatsApp, and provider portals.</p></div>
+                <div class="meta"><h4>Roles and responsibilities</h4><p><strong>E H Meyer:</strong> monitor progress and intervene where necessary to resolve delays. <strong>Admin support:</strong> track outstanding requirements and follow up regularly. <strong>Client:</strong> provide any additional requirements promptly.</p></div>
+                <div class="meta"><h4>Client experience</h4><p>The client is kept informed during implementation and does not feel overlooked once paperwork has been submitted.</p></div>
+              </div>
+            </article>
+
+            <article class="process">
+              <h3>Confirmation that the plan is active</h3>
+              <p>
+                Once the plan is active, implementation is confirmed with the client and the relevant confirmation documents,
+                schedules, or statements are placed on file. AdviceTech is then updated to reflect the completed outcome.
+              </p>
+              <div class="meta-grid">
+                <div class="meta"><h4>Compliance</h4><p>Final implementation records must be filed and reflected accurately on the CRM system.</p></div>
+                <div class="meta"><h4>Tools</h4><p>AdviceTech CRM, provider confirmations, policy schedules, email, and telephone.</p></div>
+                <div class="meta"><h4>Roles and responsibilities</h4><p><strong>E H Meyer:</strong> confirm that implementation is complete and ensure that the client understands the outcome. <strong>Admin support:</strong> file final documents and update AdviceTech. <strong>Client:</strong> review the final confirmation and raise any questions.</p></div>
+                <div class="meta"><h4>Client experience</h4><p>The client receives closure and reassurance that the matter has been completed properly.</p></div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="section" id="section-6">
+          <div class="section-header">
+            <div>
+              <span class="section-kicker">Section 6</span>
+              <h2>Monitoring the financial planning recommendations</h2>
+              <p class="section-summary">
+                Ongoing servicing centres on annual reviews, regular scheduling, and continued responsiveness
+                to client requests and changes in circumstances.
+              </p>
+            </div>
+            <div class="pill">3 processes</div>
+          </div>
+
+          <div class="processes">
+            <article class="process">
+              <h3>Scheduling annual reviews</h3>
+              <p>
+                Reviews represent a core component of the practice. As the current client base includes a substantial number of investment,
+                income plan, and living annuity clients, annual review scheduling on AdviceTech is essential,
+                both for newly implemented cases and for existing clients already on the book.
+              </p>
+              <div class="meta-grid">
+                <div class="meta"><h4>Compliance</h4><p>Review dates and service actions must be diarised and recorded properly on the CRM system.</p></div>
+                <div class="meta"><h4>Tools</h4><p>AdviceTech CRM, diary or calendar, and the client review schedule.</p></div>
+                <div class="meta"><h4>Roles and responsibilities</h4><p><strong>E H Meyer:</strong> determine review intervals and conduct the reviews. <strong>Admin support:</strong> schedule review meetings and reminders. <strong>Client:</strong> attend review meetings and provide updated information.</p></div>
+                <div class="meta"><h4>Client experience</h4><p>Clients experience proactive ongoing service and know that their affairs will be reviewed regularly rather than only when a problem arises.</p></div>
+              </div>
+            </article>
+
+            <article class="process">
+              <h3>Conducting reviews</h3>
+              <p>
+                At each review meeting, the suitability of the client’s investment, income plan, or living annuity is assessed
+                in light of market conditions, income needs, legislative developments, and changes in personal circumstances.
+                The review may result in no change, a recommendation for adjustment, or the commencement of a new advice cycle.
+              </p>
+              <div class="meta-grid">
+                <div class="meta"><h4>Compliance</h4><p>The outcome of the review and any updated advice or recommendation must be recorded appropriately.</p></div>
+                <div class="meta"><h4>Tools</h4><p>AdviceTech CRM, client statements, product information, review documentation, and meeting platforms or face-to-face meetings.</p></div>
+                <div class="meta"><h4>Roles and responsibilities</h4><p><strong>E H Meyer:</strong> review the client’s position and identify whether changes are required. <strong>Client:</strong> provide updated information and discuss changes in circumstances. <strong>Admin support:</strong> arrange meetings and capture supporting documentation where required.</p></div>
+                <div class="meta"><h4>Client experience</h4><p>The client feels supported on an ongoing basis and understands that the plan is being monitored actively.</p></div>
+              </div>
+            </article>
+
+            <article class="process">
+              <h3>Ongoing servicing and client communication</h3>
+              <p>
+                In addition to formal annual reviews, ongoing client requests received by email, telephone, and WhatsApp are addressed as part of regular servicing.
+                These may relate to general service matters, product queries, document requests, changes in circumstance,
+                or matters that require further advice.
+              </p>
+              <div class="meta-grid">
+                <div class="meta"><h4>Compliance</h4><p>All service interactions, and any advice arising from them, must be recorded appropriately.</p></div>
+                <div class="meta"><h4>Tools</h4><p>Email, telephone, WhatsApp, and AdviceTech CRM.</p></div>
+                <div class="meta"><h4>Roles and responsibilities</h4><p><strong>E H Meyer:</strong> respond to client needs and provide advice or service support where required. <strong>Admin support:</strong> assist with service follow-up and record keeping. <strong>Client:</strong> make contact when assistance is required and provide updated information where relevant.</p></div>
+                <div class="meta"><h4>Client experience</h4><p>Clients experience accessibility, responsiveness, and ongoing support between formal review dates.</p></div>
+              </div>
+            </article>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <div class="shell footer-note">
+    Advice Process, Erenst Meyer Financial Advisor.
+  </div>
+</body>
+</html>

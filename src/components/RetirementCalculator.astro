@@ -1,0 +1,74 @@
+<section class="feature-block calculator-block">
+  <div class="section-intro">
+    <p class="section-kicker">Planning tool</p>
+    <h2>Quick retirement income check</h2>
+    <p>Use this simple estimator to sense-check how long capital may last. It is not advice, but it gives visitors something genuinely useful straight away.</p>
+  </div>
+  <div class="calculator-shell" data-retirement-calculator>
+    <div class="calculator-grid">
+      <label>
+        <span>Starting capital (R)</span>
+        <input type="number" name="capital" value="2500000" min="0" step="10000" />
+      </label>
+      <label>
+        <span>Monthly income needed (R)</span>
+        <input type="number" name="income" value="18000" min="0" step="500" />
+      </label>
+      <label>
+        <span>Expected annual growth (%)</span>
+        <input type="number" name="growth" value="8" min="0" max="30" step="0.1" />
+      </label>
+      <label>
+        <span>Annual inflation (%)</span>
+        <input type="number" name="inflation" value="5" min="0" max="20" step="0.1" />
+      </label>
+    </div>
+    <div class="calculator-result">
+      <div>
+        <p class="result-label">Estimated duration</p>
+        <p class="result-value" data-years>0 years</p>
+      </div>
+      <div>
+        <p class="result-label">Real monthly income after 10 years</p>
+        <p class="result-value" data-real-income>R0</p>
+      </div>
+      <p class="meta">Assumes monthly withdrawals increasing with inflation and annual growth applied monthly.</p>
+    </div>
+  </div>
+</section>
+
+<script>
+  const root = document.querySelector('[data-retirement-calculator]');
+  if (root) {
+    const capital = root.querySelector('input[name="capital"]');
+    const income = root.querySelector('input[name="income"]');
+    const growth = root.querySelector('input[name="growth"]');
+    const inflation = root.querySelector('input[name="inflation"]');
+    const yearsOut = root.querySelector('[data-years]');
+    const realIncomeOut = root.querySelector('[data-real-income]');
+    const fmt = new Intl.NumberFormat('en-ZA', { style: 'currency', currency: 'ZAR', maximumFractionDigits: 0 });
+
+    function calculate() {
+      let balance = Number(capital.value || 0);
+      let monthlyIncome = Number(income.value || 0);
+      const monthlyGrowth = Number(growth.value || 0) / 100 / 12;
+      const monthlyInflation = Number(inflation.value || 0) / 100 / 12;
+      let months = 0;
+      let incomeAtTenYears = monthlyIncome;
+
+      while (balance > 0 && months < 1200) {
+        balance = balance * (1 + monthlyGrowth) - monthlyIncome;
+        monthlyIncome = monthlyIncome * (1 + monthlyInflation);
+        months += 1;
+        if (months === 120) incomeAtTenYears = monthlyIncome;
+      }
+
+      const years = (months / 12).toFixed(1);
+      yearsOut.textContent = `${years} years`;
+      realIncomeOut.textContent = fmt.format(incomeAtTenYears / Math.pow(1 + Number(inflation.value || 0) / 100, 10));
+    }
+
+    [capital, income, growth, inflation].forEach((input) => input?.addEventListener('input', calculate));
+    calculate();
+  }
+</script>
