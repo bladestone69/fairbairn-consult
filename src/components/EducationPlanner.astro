@@ -1,0 +1,157 @@
+<section class="feature-block calculator-block">
+  <div class="section-intro">
+    <p class="section-kicker">Planning tool</p>
+    <h2>Education Savings Planner</h2>
+    <p>Estimate how much you need to save monthly for your child's future education. Costs are estimated in today's terms and projected forward.</p>
+  </div>
+  <div class="calculator-shell" data-education>
+    <div class="calculator-grid">
+      <label>
+        <span>Child's current age</span>
+        <input type="number" name="childAge" value="5" min="0" max="18" />
+      </label>
+      <label>
+        <span>Years until tertiary education</span>
+        <input type="number" name="yearsToStudy" value="13" min="1" max="25" />
+      </label>
+      <label>
+        <span>Years of study</span>
+        <input type="number" name="studyYears" value="4" min="1" max="8" />
+      </label>
+      <label>
+        <span>Estimated annual cost today (R)</span>
+        <input type="number" name="annualCost" value="80000" min="0" step="5000" />
+      </label>
+      <label>
+        <span>Education inflation (%)</span>
+        <input type="number" name="eduInflation" value="9" min="0" max="20" step="0.5" />
+      </label>
+      <label>
+        <span>Expected investment return (%)</span>
+        <input type="number" name="return" value="8" min="0" max="20" step="0.5" />
+      </label>
+      <label>
+        <span>Current education savings (R)</span>
+        <input type="number" name="currentSavings" value="50000" min="0" step="5000" />
+      </label>
+      <label>
+        <span>Monthly contribution (R)</span>
+        <input type="number" name="monthly" value="2000" min="0" step="100" />
+      </label>
+    </div>
+    <div class="calculator-result">
+      <div class="result-row">
+        <div>
+          <p class="result-label">Future Cost (total)</p>
+          <p class="result-value" data-future-cost>R0</p>
+        </div>
+        <div>
+          <p class="result-label">Projected Savings</p>
+          <p class="result-value" data-projected>R0</p>
+        </div>
+        <div>
+          <p class="result-label">Shortfall / Surplus</p>
+          <p class="result-value" data-gap>R0</p>
+        </div>
+      </div>
+      <div>
+        <p class="result-label">Suggested Monthly Savings</p>
+        <p class="result-value secondary" data-suggested>R0</p>
+      </div>
+      <p class="meta">Future cost assumes education inflation compounding. Suggested savings assumes achieving the target with current savings as a head start.</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .result-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    background: var(--sl-color-bg);
+    border-radius: 0.5rem;
+  }
+  .result-value.secondary {
+    color: var(--sl-color-accent);
+  }
+  @media (max-width: 640px) {
+    .result-row {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  const root = document.querySelector('[data-education]');
+  if (root) {
+    const fmt = new Intl.NumberFormat('en-ZA', { style: 'currency', currency: 'ZAR', maximumFractionDigits: 0 });
+
+    const inputs = {
+      childAge: root.querySelector('input[name="childAge"]'),
+      yearsToStudy: root.querySelector('input[name="yearsToStudy"]'),
+      studyYears: root.querySelector('input[name="studyYears"]'),
+      annualCost: root.querySelector('input[name="annualCost"]'),
+      eduInflation: root.querySelector('input[name="eduInflation"]'),
+      return: root.querySelector('input[name="return"]'),
+      currentSavings: root.querySelector('input[name="currentSavings"]'),
+      monthly: root.querySelector('input[name="monthly"]'),
+    };
+
+    const outputs = {
+      futureCost: root.querySelector('[data-future-cost]'),
+      projected: root.querySelector('[data-projected]'),
+      gap: root.querySelector('[data-gap]'),
+      suggested: root.querySelector('[data-suggested]'),
+    };
+
+    function calculate() {
+      const yearsToStudy = Number(inputs.yearsToStudy.value || 0);
+      const studyYears = Number(inputs.studyYears.value || 0);
+      const annualCost = Number(inputs.annualCost.value || 0);
+      const eduInflation = Number(inputs.eduInflation.value || 0) / 100;
+      const investmentReturn = Number(inputs.return.value || 0) / 100;
+      const currentSavings = Number(inputs.currentSavings.value || 0);
+      const monthly = Number(inputs.monthly.value || 0);
+
+      // Calculate future cost of education (inflation-adjusted)
+      let futureCost = 0;
+      const costAtStart = annualCost * Math.pow(1 + eduInflation, yearsToStudy);
+      for (let i = 0; i < studyYears; i++) {
+        futureCost += costAtStart * Math.pow(1 + eduInflation, i);
+      }
+
+      // Calculate projected savings
+      const monthlyReturn = investmentReturn / 12;
+      const months = yearsToStudy * 12;
+      let projected = currentSavings * Math.pow(1 + monthlyReturn, months);
+      if (monthlyReturn > 0) {
+        projected += monthly * ((Math.pow(1 + monthlyReturn, months) - 1) / monthlyReturn);
+      } else {
+        projected += monthly * months;
+      }
+
+      // Calculate gap
+      const gap = projected - futureCost;
+
+      // Calculate suggested monthly savings to meet target
+      let suggested = 0;
+      if (months > 0 && monthlyReturn > 0) {
+        const neededFromContributions = Math.max(0, futureCost - currentSavings * Math.pow(1 + monthlyReturn, months));
+        suggested = neededFromContributions * monthlyReturn / (Math.pow(1 + monthlyReturn, months) - 1);
+      } else if (months > 0) {
+        suggested = Math.max(0, futureCost - currentSavings) / months;
+      }
+
+      outputs.futureCost.textContent = fmt.format(futureCost);
+      outputs.projected.textContent = fmt.format(projected);
+      outputs.gap.textContent = fmt.format(Math.abs(gap)) + (gap >= 0 ? ' surplus' : ' shortfall');
+      outputs.gap.style.color = gap >= 0 ? 'var(--sl-color-success)' : 'var(--sl-color-warning)';
+      outputs.suggested.textContent = fmt.format(Math.ceil(suggested / 100) * 100);
+    }
+
+    Object.values(inputs).forEach(input => input?.addEventListener('input', calculate));
+    calculate();
+  }
+</script>

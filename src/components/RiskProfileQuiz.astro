@@ -1,0 +1,161 @@
+<section class="feature-block calculator-block">
+  <div class="section-intro">
+    <p class="section-kicker">Planning tool</p>
+    <h2>Risk Profile Assessment</h2>
+    <p>Answer these questions to get a sense of your investment risk tolerance. This is a guide, not advice — proper risk profiling requires a comprehensive discussion.</p>
+  </div>
+  <div class="calculator-shell" data-risk-quiz>
+    <div class="quiz-questions">
+      <div class="quiz-question">
+        <p class="question-text">1. If your investment dropped 20% in a year, what would you do?</p>
+        <div class="quiz-options">
+          <label><input type="radio" name="q1" value="1" /> Sell everything — I can't handle losses</label>
+          <label><input type="radio" name="q1" value="2" /> Sell some — reduce my exposure</label>
+          <label><input type="radio" name="q1" value="3" /> Hold — wait for recovery</label>
+          <label><input type="radio" name="q1" value="4" /> Buy more — markets are on sale</label>
+        </div>
+      </div>
+      <div class="quiz-question">
+        <p class="question-text">2. How long before you'll need to access these funds?</p>
+        <div class="quiz-options">
+          <label><input type="radio" name="q2" value="1" /> Less than 3 years</label>
+          <label><input type="radio" name="q2" value="2" /> 3–5 years</label>
+          <label><input type="radio" name="q2" value="3" /> 5–10 years</label>
+          <label><input type="radio" name="q2" value="4" /> More than 10 years</label>
+        </div>
+      </div>
+      <div class="quiz-question">
+        <p class="question-text">3. Which best describes your investment experience?</p>
+        <div class="quiz-options">
+          <label><input type="radio" name="q3" value="1" /> None — I've only had savings accounts</label>
+          <label><input type="radio" name="q3" value="2" /> Some — I've had unit trusts or ETFs</label>
+          <label><input type="radio" name="q3" value="3" /> Moderate — I understand market cycles</label>
+          <label><input type="radio" name="q3" value="4" /> Experienced — I actively manage investments</label>
+        </div>
+      </div>
+      <div class="quiz-question">
+        <p class="question-text">4. What's your primary investment goal?</p>
+        <div class="quiz-options">
+          <label><input type="radio" name="q4" value="1" /> Capital preservation — avoid any loss</label>
+          <label><input type="radio" name="q4" value="2" /> Income — regular, stable returns</label>
+          <label><input type="radio" name="q4" value="3" /> Balanced growth — some volatility acceptable</label>
+          <label><input type="radio" name="q4" value="4" /> Maximum growth — volatility expected</label>
+        </div>
+      </div>
+      <div class="quiz-question">
+        <p class="question-text">5. If you had to choose between these hypothetical portfolios, which would you pick?</p>
+        <div class="quiz-options">
+          <label><input type="radio" name="q5" value="1" /> Portfolio A: Best year +6%, Worst year +2%</label>
+          <label><input type="radio" name="q5" value="2" /> Portfolio B: Best year +12%, Worst year -5%</label>
+          <label><input type="radio" name="q5" value="3" /> Portfolio C: Best year +20%, Worst year -12%</label>
+          <label><input type="radio" name="q5" value="4" /> Portfolio D: Best year +35%, Worst year -25%</label>
+        </div>
+      </div>
+    </div>
+    <div class="calculator-result">
+      <div>
+        <p class="result-label">Your Risk Profile</p>
+        <p class="result-value" data-profile>Answer all questions</p>
+      </div>
+      <div class="profile-description" data-description style="display:none;">
+        <p></p>
+      </div>
+      <p class="meta">This is a simplified guide. A full risk assessment considers your complete financial situation, income stability, dependants, and other factors.</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .quiz-question {
+    margin-bottom: 1.5rem;
+  }
+  .question-text {
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: var(--text-main);
+  }
+  .quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .quiz-options label {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: var(--sl-color-bg);
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .quiz-options label:hover {
+    background: var(--sl-color-bg-hover);
+  }
+  .quiz-options input[type="radio"] {
+    margin-top: 0.2rem;
+    accent-color: var(--sl-color-accent);
+  }
+  .profile-description {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: var(--sl-color-bg);
+    border-radius: 0.5rem;
+    border-left: 3px solid var(--sl-color-accent);
+  }
+</style>
+
+<script>
+  const root = document.querySelector('[data-risk-quiz]');
+  if (root) {
+    const profileOut = root.querySelector('[data-profile]');
+    const descOut = root.querySelector('[data-description]');
+    
+    const profiles = {
+      conservative: {
+        name: 'Conservative',
+        description: 'You prefer stability over growth. Suitable investments: money market funds, income funds, low-equity balanced funds (0-20% equity). Focus on capital preservation with modest returns.',
+      },
+      moderate: {
+        name: 'Moderately Conservative',
+        description: 'You accept some volatility for better returns. Suitable investments: medium-equity balanced funds (20-40% equity), conservative allocation funds. Income with some growth.',
+      },
+      balanced: {
+        name: 'Balanced',
+        description: 'You accept moderate volatility for long-term growth. Suitable investments: balanced funds (40-60% equity), diversified portfolios. Growth with managed risk.',
+      },
+      aggressive: {
+        name: 'Growth-Oriented',
+        description: 'You can handle significant volatility for higher potential returns. Suitable investments: high-equity funds (60-75%+ equity), equity funds, growth portfolios. Long-term focus essential.',
+      },
+    };
+
+    function calculate() {
+      const inputs = root.querySelectorAll('input[type="radio"]:checked');
+      if (inputs.length < 5) {
+        profileOut.textContent = 'Answer all questions';
+        descOut.style.display = 'none';
+        return;
+      }
+
+      let score = 0;
+      inputs.forEach(input => score += Number(input.value));
+      
+      const avgScore = score / 5;
+      let profile;
+      
+      if (avgScore <= 1.5) profile = profiles.conservative;
+      else if (avgScore <= 2.5) profile = profiles.moderate;
+      else if (avgScore <= 3.5) profile = profiles.balanced;
+      else profile = profiles.aggressive;
+
+      profileOut.textContent = profile.name;
+      descOut.querySelector('p').textContent = profile.description;
+      descOut.style.display = 'block';
+    }
+
+    root.querySelectorAll('input[type="radio"]').forEach(input => {
+      input.addEventListener('change', calculate);
+    });
+  }
+</script>

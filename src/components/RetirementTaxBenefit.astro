@@ -1,0 +1,213 @@
+<section class="feature-block calculator-block">
+  <div class="section-intro">
+    <p class="section-kicker">Planning tool</p>
+    <h2>Retirement Contribution Tax Benefit</h2>
+    <p>See how much tax you can save by contributing to a retirement annuity. Contributions are tax-deductible within limits.</p>
+  </div>
+  <div class="calculator-shell" data-tax-benefit>
+    <div class="calculator-grid">
+      <label>
+        <span>Annual gross income (R)</span>
+        <input type="number" name="income" value="600000" min="0" step="10000" />
+      </label>
+      <label>
+        <span>Current pension/provident contributions (R/year)</span>
+        <input type="number" name="pension" value="60000" min="0" step="5000" />
+      </label>
+      <label>
+        <span>Planned RA contribution (R/year)</span>
+        <input type="number" name="raContribution" value="100000" min="0" step="5000" />
+      </label>
+      <label>
+        <span>Tax year</span>
+        <select name="taxYear">
+          <option value="2026">2026 (current)</option>
+          <option value="2025">2025</option>
+        </select>
+      </label>
+    </div>
+    <div class="calculator-result">
+      <div class="result-row">
+        <div>
+          <p class="result-label">Total Contributions</p>
+          <p class="result-value" data-total>R0</p>
+        </div>
+        <div>
+          <p class="result-label">Deduction Limit (27.5%)</p>
+          <p class="result-value neutral" data-limit>R0</p>
+        </div>
+        <div>
+          <p class="result-label">Allowable Deduction</p>
+          <p class="result-value" data-allowable>R0</p>
+        </div>
+      </div>
+      <div class="result-row highlight">
+        <div>
+          <p class="result-label">Tax Before Deduction</p>
+          <p class="result-value neutral" data-tax-before>R0</p>
+        </div>
+        <div>
+          <p class="result-label">Tax After Deduction</p>
+          <p class="result-value" data-tax-after>R0</p>
+        </div>
+        <div>
+          <p class="result-label">Tax Saved</p>
+          <p class="result-value large" data-saved>R0</p>
+        </div>
+      </div>
+      <div class="result-row">
+        <div>
+          <p class="result-label">Effective Cost of RA</p>
+          <p class="result-value" data-effective>R0</p>
+        </div>
+        <div>
+          <p class="result-label">Effective Discount</p>
+          <p class="result-value secondary" data-discount>0%</p>
+        </div>
+        <div>
+          <p class="result-label">Unused Carried Forward</p>
+          <p class="result-value neutral" data-carried>R0</p>
+        </div>
+      </div>
+      <p class="meta">Deduction limited to 27.5% of taxable income, capped at R350 000/year (2025/2026). Excess contributions carry forward. Tax calculated using 2026 tax tables.</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .result-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    background: var(--sl-color-bg);
+    border-radius: 0.5rem;
+  }
+  .result-row.highlight {
+    background: var(--sl-color-bg-hover);
+    border: 1px solid var(--sl-color-hairline);
+  }
+  .result-value {
+    font-size: 0.95rem;
+    line-height: 1.3;
+  }
+  .result-label {
+    font-size: 0.75rem;
+  }
+  .result-value.neutral {
+    opacity: 0.8;
+  }
+  .result-value.large {
+    color: var(--sl-color-success);
+  }
+  .result-value.secondary {
+    color: var(--sl-color-accent);
+  }
+  @media (max-width: 768px) {
+    .result-value {
+      font-size: 0.85rem;
+    }
+    .result-label {
+      font-size: 0.7rem;
+    }
+  }
+  @media (max-width: 640px) {
+    .result-row {
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+    }
+    .result-value {
+      font-size: 0.8rem;
+    }
+    .result-label {
+      font-size: 0.65rem;
+    }
+  }
+</style>
+
+<script>
+  const root = document.querySelector('[data-tax-benefit]');
+  if (root) {
+    const fmt = new Intl.NumberFormat('en-ZA', { style: 'currency', currency: 'ZAR', maximumFractionDigits: 0 });
+
+    const inputs = {
+      income: root.querySelector('input[name="income"]'),
+      pension: root.querySelector('input[name="pension"]'),
+      raContribution: root.querySelector('input[name="raContribution"]'),
+      taxYear: root.querySelector('select[name="taxYear"]'),
+    };
+
+    const outputs = {
+      total: root.querySelector('[data-total]'),
+      limit: root.querySelector('[data-limit]'),
+      allowable: root.querySelector('[data-allowable]'),
+      taxBefore: root.querySelector('[data-tax-before]'),
+      taxAfter: root.querySelector('[data-tax-after]'),
+      saved: root.querySelector('[data-saved]'),
+      effective: root.querySelector('[data-effective]'),
+      discount: root.querySelector('[data-discount]'),
+      carried: root.querySelector('[data-carried]'),
+    };
+
+    const ANNUAL_CAP = 350000;
+
+    // Simplified 2026 tax brackets (monthly equivalent annualized)
+    function calculateTax(income) {
+      const brackets = [
+        { threshold: 237100, rate: 0.18, base: 0 },
+        { threshold: 370500, rate: 0.26, base: 42678 },
+        { threshold: 512800, rate: 0.31, base: 77362 },
+        { threshold: 673000, rate: 0.36, base: 121478 },
+        { threshold: 857900, rate: 0.39, base: 187945 },
+        { threshold: 1817000, rate: 0.41, base: 263353 },
+        { threshold: Infinity, rate: 0.45, base: 655733 },
+      ];
+
+      let tax = 0;
+      for (const bracket of brackets) {
+        if (income <= bracket.threshold) {
+          tax = bracket.base + (income - (brackets[brackets.indexOf(bracket) - 1]?.threshold || 0)) * bracket.rate;
+          break;
+        }
+      }
+
+      // Primary rebate 2026
+      const rebate = 17235;
+      return Math.max(0, tax - rebate);
+    }
+
+    function calculate() {
+      const income = Number(inputs.income.value || 0);
+      const pension = Number(inputs.pension.value || 0);
+      const raContribution = Number(inputs.raContribution.value || 0);
+
+      const total = pension + raContribution;
+      const limit = Math.min(income * 0.275, ANNUAL_CAP);
+      const allowable = Math.min(total, limit);
+      const carried = Math.max(0, total - allowable);
+
+      const taxBefore = calculateTax(income);
+      const taxableAfter = income - allowable;
+      const taxAfter = calculateTax(taxableAfter);
+      const saved = taxBefore - taxAfter;
+
+      const effectiveCost = raContribution - saved;
+      const discountPercent = raContribution > 0 ? (saved / raContribution * 100) : 0;
+
+      outputs.total.textContent = fmt.format(total);
+      outputs.limit.textContent = fmt.format(limit);
+      outputs.allowable.textContent = fmt.format(allowable);
+      outputs.taxBefore.textContent = fmt.format(taxBefore);
+      outputs.taxAfter.textContent = fmt.format(taxAfter);
+      outputs.saved.textContent = fmt.format(saved);
+      outputs.effective.textContent = fmt.format(effectiveCost);
+      outputs.discount.textContent = discountPercent.toFixed(1) + '%';
+      outputs.carried.textContent = fmt.format(carried);
+    }
+
+    Object.values(inputs).forEach(input => input?.addEventListener('input', calculate));
+    Object.values(inputs).forEach(input => input?.addEventListener('change', calculate));
+    calculate();
+  }
+</script>

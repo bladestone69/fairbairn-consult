@@ -1,0 +1,155 @@
+<section class="feature-block calculator-block">
+  <div class="section-intro">
+    <p class="section-kicker">Planning tool</p>
+    <h2>Death & Disability Shortfall Analysis</h2>
+    <p>Check if you have enough cover to protect your family's financial future. This identifies potential gaps — not advice, but a useful starting point.</p>
+  </div>
+  <div class="calculator-shell" data-death-disability>
+    <div class="calculator-grid">
+      <label>
+        <span>Your gross annual income (R)</span>
+        <input type="number" name="income" value="600000" min="0" step="10000" />
+      </label>
+      <label>
+        <span>Years of income replacement needed</span>
+        <input type="number" name="years" value="20" min="1" max="40" />
+      </label>
+      <label>
+        <span>Outstanding debt (home loan, loans) (R)</span>
+        <input type="number" name="debt" value="1200000" min="0" step="50000" />
+      </label>
+      <label>
+        <span>Children's education fund needed (R)</span>
+        <input type="number" name="education" value="400000" min="0" step="25000" />
+      </label>
+      <label>
+        <span>Emergency fund needed (R)</span>
+        <input type="number" name="emergency" value="150000" min="0" step="10000" />
+      </label>
+      <label>
+        <span>Existing life cover (R)</span>
+        <input type="number" name="lifeCover" value="2000000" min="0" step="50000" />
+      </label>
+      <label>
+        <span>Existing disability cover (R)</span>
+        <input type="number" name="disabilityCover" value="1500000" min="0" step="50000" />
+      </label>
+      <label>
+        <span>Investment/savings available (R)</span>
+        <input type="number" name="savings" value="300000" min="0" step="25000" />
+      </label>
+    </div>
+    <div class="calculator-result">
+      <div class="result-row">
+        <div>
+          <p class="result-label">Total Death Need</p>
+          <p class="result-value" data-death-need>R0</p>
+        </div>
+        <div>
+          <p class="result-label">Existing Cover</p>
+          <p class="result-value neutral" data-death-cover>R0</p>
+        </div>
+        <div>
+          <p class="result-label">Death Shortfall</p>
+          <p class="result-value" data-death-gap>R0</p>
+        </div>
+      </div>
+      <div class="result-row">
+        <div>
+          <p class="result-label">Total Disability Need</p>
+          <p class="result-value" data-disability-need>R0</p>
+        </div>
+        <div>
+          <p class="result-label">Existing Cover</p>
+          <p class="result-value neutral" data-disability-cover>R0</p>
+        </div>
+        <div>
+          <p class="result-label">Disability Shortfall</p>
+          <p class="result-value" data-disability-gap>R0</p>
+        </div>
+      </div>
+      <p class="meta">Death need = income replacement + debt + education + emergency - savings. Disability need assumes income replacement plus debt settlement.</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .result-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    background: var(--sl-color-bg);
+    border-radius: 0.5rem;
+  }
+  .result-value.neutral {
+    opacity: 0.8;
+  }
+  @media (max-width: 640px) {
+    .result-row {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  const root = document.querySelector('[data-death-disability]');
+  if (root) {
+    const fmt = new Intl.NumberFormat('en-ZA', { style: 'currency', currency: 'ZAR', maximumFractionDigits: 0 });
+
+    const inputs = {
+      income: root.querySelector('input[name="income"]'),
+      years: root.querySelector('input[name="years"]'),
+      debt: root.querySelector('input[name="debt"]'),
+      education: root.querySelector('input[name="education"]'),
+      emergency: root.querySelector('input[name="emergency"]'),
+      lifeCover: root.querySelector('input[name="lifeCover"]'),
+      disabilityCover: root.querySelector('input[name="disabilityCover"]'),
+      savings: root.querySelector('input[name="savings"]'),
+    };
+
+    const outputs = {
+      deathNeed: root.querySelector('[data-death-need]'),
+      deathCover: root.querySelector('[data-death-cover]'),
+      deathGap: root.querySelector('[data-death-gap]'),
+      disabilityNeed: root.querySelector('[data-disability-need]'),
+      disabilityCover: root.querySelector('[data-disability-cover]'),
+      disabilityGap: root.querySelector('[data-disability-gap]'),
+    };
+
+    function calculate() {
+      const income = Number(inputs.income.value || 0);
+      const years = Number(inputs.years.value || 0);
+      const debt = Number(inputs.debt.value || 0);
+      const education = Number(inputs.education.value || 0);
+      const emergency = Number(inputs.emergency.value || 0);
+      const lifeCover = Number(inputs.lifeCover.value || 0);
+      const disabilityCover = Number(inputs.disabilityCover.value || 0);
+      const savings = Number(inputs.savings.value || 0);
+
+      // Death need: income replacement (simplified - income × years × 70% replacement ratio) + debt + education + emergency - savings
+      const deathNeed = Math.max(0, (income * years * 0.7) + debt + education + emergency - savings);
+      const deathGap = Math.max(0, deathNeed - lifeCover);
+
+      // Disability need: similar but often need higher income replacement (can't work but still have expenses)
+      const disabilityNeed = Math.max(0, (income * years * 0.75) + debt - savings);
+      const disabilityGap = Math.max(0, disabilityNeed - disabilityCover);
+
+      outputs.deathNeed.textContent = fmt.format(deathNeed);
+      outputs.deathCover.textContent = fmt.format(lifeCover);
+      outputs.deathGap.textContent = fmt.format(deathGap);
+
+      outputs.disabilityNeed.textContent = fmt.format(disabilityNeed);
+      outputs.disabilityCover.textContent = fmt.format(disabilityCover);
+      outputs.disabilityGap.textContent = fmt.format(disabilityGap);
+
+      // Color coding for gaps
+      outputs.deathGap.style.color = deathGap > 0 ? 'var(--sl-color-warning)' : 'var(--sl-color-success)';
+      outputs.disabilityGap.style.color = disabilityGap > 0 ? 'var(--sl-color-warning)' : 'var(--sl-color-success)';
+    }
+
+    Object.values(inputs).forEach(input => input?.addEventListener('input', calculate));
+    calculate();
+  }
+</script>

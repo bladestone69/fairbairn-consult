@@ -258,6 +258,23 @@ h4 {
   outline-offset: 3px;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .sl-markdown-content .cta-row a:hover,
+  .sl-markdown-content .service-card:hover,
+  .sl-markdown-content .doc-card:hover,
+  .sl-markdown-content .process-card:hover {
+    transform: none;
+  }
+}
+
 .sl-markdown-content .service-grid,
 .sl-markdown-content .doc-grid,
 .sl-markdown-content .process-grid {
@@ -549,15 +566,23 @@ h4 {
 }
 
 .result-label {
-  margin: 0 0 .35rem;
+  margin: 0 0 .25rem;
   color: var(--text-muted);
-  font-size: .9rem;
+  font-size: .8rem;
 }
 
 .result-value {
   margin: 0;
-  font-size: clamp(1.4rem, 4vw, 2rem);
-  font-weight: 800;
+  font-size: .95rem;
+  font-weight: 600;
+  line-height: 1.35;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+
+.result-value.large {
+  font-size: 1.1rem;
 }
 
 .faq-list {

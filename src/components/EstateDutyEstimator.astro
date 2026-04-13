@@ -1,0 +1,151 @@
+<section class="feature-block calculator-block">
+  <div class="section-intro">
+    <p class="section-kicker">Planning tool</p>
+    <h2>Estate Duty Estimator</h2>
+    <p>Get a rough estimate of potential estate duty liability. This is simplified — actual calculations require professional estate planning advice.</p>
+  </div>
+  <div class="calculator-shell" data-estate>
+    <div class="calculator-grid">
+      <label>
+        <span>Total assets (property, investments, savings) (R)</span>
+        <input type="number" name="assets" value="5000000" min="0" step="100000" />
+      </label>
+      <label>
+        <span>Property value included above (R)</span>
+        <input type="number" name="property" value="2000000" min="0" step="100000" />
+      </label>
+      <label>
+        <span>Total liabilities (debts, bonds) (R)</span>
+        <input type="number" name="liabilities" value="800000" min="0" step="50000" />
+      </label>
+      <label>
+        <span>Bequests to spouse (R)</span>
+        <input type="number" name="spouseBequest" value="0" min="0" step="50000" />
+      </label>
+      <label>
+        <span>Bequests to approved charities (R)</span>
+        <input type="number" name="charityBequest" value="0" min="0" step="10000" />
+      </label>
+      <label>
+        <span>Existing life cover in estate (R)</span>
+        <input type="number" name="lifeCover" value="1000000" min="0" step="50000" />
+      </label>
+    </div>
+    <div class="calculator-result">
+      <div class="result-row">
+        <div>
+          <p class="result-label">Net Estate Value</p>
+          <p class="result-value" data-net-estate>R0</p>
+        </div>
+        <div>
+          <p class="result-label">Section 4A Abatement</p>
+          <p class="result-value neutral" data-abatement>R3 500 000</p>
+        </div>
+        <div>
+          <p class="result-label">Dutiable Estate</p>
+          <p class="result-value" data-dutiable>R0</p>
+        </div>
+      </div>
+      <div class="result-row highlight">
+        <div>
+          <p class="result-label">Estate Duty Payable</p>
+          <p class="result-value large" data-duty>R0</p>
+        </div>
+        <div>
+          <p class="result-label">Executor Fees (est. 3.5%)</p>
+          <p class="result-value" data-executor>R0</p>
+        </div>
+        <div>
+          <p class="result-label">Liquidity Need</p>
+          <p class="result-value" data-liquidity>R0</p>
+        </div>
+      </div>
+      <p class="meta">Estate duty is 20% on dutiable estate up to R30m, 25% above. Section 4A abatement is R3.5m. Spouse bequests are generally exempt. This is a simplified estimate only.</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .result-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    background: var(--sl-color-bg);
+    border-radius: 0.5rem;
+  }
+  .result-row.highlight {
+    background: var(--sl-color-bg-hover);
+    border: 1px solid var(--sl-color-hairline);
+  }
+  .result-value.neutral {
+    opacity: 0.8;
+  }
+  @media (max-width: 640px) {
+    .result-row {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  const root = document.querySelector('[data-estate]');
+  if (root) {
+    const fmt = new Intl.NumberFormat('en-ZA', { style: 'currency', currency: 'ZAR', maximumFractionDigits: 0 });
+
+    const inputs = {
+      assets: root.querySelector('input[name="assets"]'),
+      property: root.querySelector('input[name="property"]'),
+      liabilities: root.querySelector('input[name="liabilities"]'),
+      spouseBequest: root.querySelector('input[name="spouseBequest"]'),
+      charityBequest: root.querySelector('input[name="charityBequest"]'),
+      lifeCover: root.querySelector('input[name="lifeCover"]'),
+    };
+
+    const outputs = {
+      netEstate: root.querySelector('[data-net-estate]'),
+      abatement: root.querySelector('[data-abatement]'),
+      dutiable: root.querySelector('[data-dutiable]'),
+      duty: root.querySelector('[data-duty]'),
+      executor: root.querySelector('[data-executor]'),
+      liquidity: root.querySelector('[data-liquidity]'),
+    };
+
+    const SECTION_4A_ABATEMENT = 3500000;
+
+    function calculate() {
+      const assets = Number(inputs.assets.value || 0);
+      const liabilities = Number(inputs.liabilities.value || 0);
+      const spouseBequest = Number(inputs.spouseBequest.value || 0);
+      const charityBequest = Number(inputs.charityBequest.value || 0);
+      const lifeCover = Number(inputs.lifeCover.value || 0);
+
+      // Net estate
+      const netEstate = assets - liabilities;
+
+      // Dutiable estate after abatements and deductions
+      let dutiable = netEstate - SECTION_4A_ABATEMENT - spouseBequest - charityBequest;
+      dutiable = Math.max(0, dutiable);
+
+      // Estate duty (20% up to R30m, 25% above - simplified to 20% for this calc)
+      const duty = dutiable > 0 ? dutiable * 0.20 : 0;
+
+      // Executor fees (typically 3.5% of gross assets)
+      const executorFees = assets * 0.035;
+
+      // Liquidity need in estate
+      const liquidityNeed = duty + executorFees - lifeCover;
+
+      outputs.netEstate.textContent = fmt.format(netEstate);
+      outputs.dutiable.textContent = fmt.format(dutiable);
+      outputs.duty.textContent = fmt.format(duty);
+      outputs.executor.textContent = fmt.format(executorFees);
+      outputs.liquidity.textContent = fmt.format(Math.max(0, liquidityNeed));
+      outputs.liquidity.style.color = liquidityNeed > lifeCover ? 'var(--sl-color-warning)' : 'var(--sl-color-success)';
+    }
+
+    Object.values(inputs).forEach(input => input?.addEventListener('input', calculate));
+    calculate();
+  }
+</script>

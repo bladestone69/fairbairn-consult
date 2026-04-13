@@ -1,0 +1,147 @@
+<section class="feature-block calculator-block">
+  <div class="section-intro">
+    <p class="section-kicker">Planning tool</p>
+    <h2>Emergency Fund Target</h2>
+    <p>Calculate how much you should have saved for unexpected expenses. The general rule is 3-6 months of essential expenses.</p>
+  </div>
+  <div class="calculator-shell" data-emergency>
+    <div class="calculator-grid">
+      <label>
+        <span>Monthly housing (rent/bond) (R)</span>
+        <input type="number" name="housing" value="12000" min="0" step="500" />
+      </label>
+      <label>
+        <span>Monthly utilities (R)</span>
+        <input type="number" name="utilities" value="3000" min="0" step="100" />
+      </label>
+      <label>
+        <span>Monthly transport (R)</span>
+        <input type="number" name="transport" value="5000" min="0" step="100" />
+      </label>
+      <label>
+        <span>Monthly food & household (R)</span>
+        <input type="number" name="food" value="6000" min="0" step="100" />
+      </label>
+      <label>
+        <span>Monthly insurance & medical aid (R)</span>
+        <input type="number" name="insurance" value="4500" min="0" step="100" />
+      </label>
+      <label>
+        <span>Monthly debt payments (R)</span>
+        <input type="number" name="debt" value="3000" min="0" step="100" />
+      </label>
+      <label>
+        <span>Other essential monthly expenses (R)</span>
+        <input type="number" name="other" value="2000" min="0" step="100" />
+      </label>
+      <label>
+        <span>Current emergency savings (R)</span>
+        <input type="number" name="current" value="25000" min="0" step="1000" />
+      </label>
+    </div>
+    <div class="calculator-result">
+      <div class="result-row">
+        <div>
+          <p class="result-label">Monthly Essentials</p>
+          <p class="result-value" data-monthly>R0</p>
+        </div>
+        <div>
+          <p class="result-label">3-Month Target</p>
+          <p class="result-value secondary" data-three>R0</p>
+        </div>
+        <div>
+          <p class="result-label">6-Month Target</p>
+          <p class="result-value secondary" data-six>R0</p>
+        </div>
+      </div>
+      <div class="result-row">
+        <div>
+          <p class="result-label">Current Savings</p>
+          <p class="result-value neutral" data-current>R0</p>
+        </div>
+        <div>
+          <p class="result-label">Shortfall (to 3 months)</p>
+          <p class="result-value" data-gap-three>R0</p>
+        </div>
+        <div>
+          <p class="result-label">Shortfall (to 6 months)</p>
+          <p class="result-value" data-gap-six>R0</p>
+        </div>
+      </div>
+      <p class="meta">Aim for 3 months minimum, 6 months ideal. Adjust based on job stability, dependants, and health considerations.</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .result-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    background: var(--sl-color-bg);
+    border-radius: 0.5rem;
+  }
+  .result-value.neutral {
+    opacity: 0.8;
+  }
+  .result-value.secondary {
+    color: var(--sl-color-accent);
+  }
+  @media (max-width: 640px) {
+    .result-row {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  const root = document.querySelector('[data-emergency]');
+  if (root) {
+    const fmt = new Intl.NumberFormat('en-ZA', { style: 'currency', currency: 'ZAR', maximumFractionDigits: 0 });
+
+    const inputs = {
+      housing: root.querySelector('input[name="housing"]'),
+      utilities: root.querySelector('input[name="utilities"]'),
+      transport: root.querySelector('input[name="transport"]'),
+      food: root.querySelector('input[name="food"]'),
+      insurance: root.querySelector('input[name="insurance"]'),
+      debt: root.querySelector('input[name="debt"]'),
+      other: root.querySelector('input[name="other"]'),
+      current: root.querySelector('input[name="current"]'),
+    };
+
+    const outputs = {
+      monthly: root.querySelector('[data-monthly]'),
+      three: root.querySelector('[data-three]'),
+      six: root.querySelector('[data-six]'),
+      current: root.querySelector('[data-current]'),
+      gapThree: root.querySelector('[data-gap-three]'),
+      gapSix: root.querySelector('[data-gap-six]'),
+    };
+
+    function calculate() {
+      const monthly = Object.keys(inputs).slice(0, 7).reduce((sum, key) => sum + Number(inputs[key].value || 0), 0);
+      const current = Number(inputs.current.value || 0);
+
+      const three = monthly * 3;
+      const six = monthly * 6;
+      const gapThree = Math.max(0, three - current);
+      const gapSix = Math.max(0, six - current);
+
+      outputs.monthly.textContent = fmt.format(monthly);
+      outputs.three.textContent = fmt.format(three);
+      outputs.six.textContent = fmt.format(six);
+      outputs.current.textContent = fmt.format(current);
+      outputs.gapThree.textContent = gapThree > 0 ? fmt.format(gapThree) : '✓ Target met';
+      outputs.gapSix.textContent = gapSix > 0 ? fmt.format(gapSix) : '✓ Target met';
+
+      outputs.gapThree.style.color = gapThree > 0 ? 'var(--sl-color-warning)' : 'var(--sl-color-success)';
+      outputs.gapSix.style.color = gapSix > 0 ? 'var(--sl-color-warning)' : 'var(--sl-color-success)';
+    }
+
+    Object.values(inputs).forEach(input => input?.addEventListener('input', calculate));
+    calculate();
+  }
+</script>
