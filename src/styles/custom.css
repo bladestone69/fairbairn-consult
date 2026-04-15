@@ -70,6 +70,38 @@ h4 {
   color: var(--text-main);
 }
 
+/* Hide sidebar completely */
+.sidebar-pane,
+[data-has-sidebar] .sidebar-pane,
+.sl-sidebar,
+nav.sidebar {
+  display: none !important;
+  width: 0 !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Expand content to full width */
+[data-has-sidebar] .main-frame,
+[data-has-sidebar] .content-panel,
+.sl-container {
+  max-width: 100% !important;
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+
+.main-pane {
+  grid-template-columns: 1fr !important;
+}
+
+/* Hide sidebar toggle button */
+.sl-sidebar-toggle,
+button[aria-label*="sidebar"],
+.mobile-menu-toggle {
+  display: none !important;
+}
+
 [data-has-sidebar] .main-frame,
 .sl-container {
   max-width: 78rem;
