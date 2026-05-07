@@ -3,7 +3,7 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 
 export default defineConfig({
-  site: 'https://fairbairn-consult.vercel.app',
+  site: 'https://www.financial-advisor.co.za',
   integrations: [
     starlight({
       title: 'Erenst Meyer Financial Advisor',
@@ -11,6 +11,9 @@ export default defineConfig({
       favicon: '/favicon.svg',
       social: [],
       customCss: ['./src/styles/custom.css'],
+      components: {
+        PageFrame: './src/components/overrides/PageFrame.astro',
+      },
       sidebar: [
         {
           label: 'About',

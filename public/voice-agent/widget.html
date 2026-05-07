@@ -1,0 +1,158 @@
+<!-- Voice Agent Widget — Erenst Meyer Financial Advisor -->
+<link rel="stylesheet" href="/voice-agent/voice-agent.css">
+
+<div class="voice-agent-widget" id="voiceAgentWidget">
+  <!-- Floating button -->
+  <button class="voice-agent-btn" id="voiceAgentBtn" aria-label="Talk to Ara, our AI receptionist" title="Talk to Ara">
+    🎙️
+  </button>
+
+  <!-- Chat panel -->
+  <div class="voice-agent-panel" id="voiceAgentPanel">
+    <div class="voice-agent-header">
+      <div class="voice-agent-avatar">A</div>
+      <div class="voice-agent-header-info">
+        <h3>Ara</h3>
+        <span id="voiceAgentStatus">AI Receptionist · Erenst Meyer</span>
+      </div>
+      <button class="voice-agent-close" id="voiceAgentClose" aria-label="Close">&times;</button>
+    </div>
+
+    <div class="voice-agent-transcript" id="voiceAgentTranscript">
+      <div class="voice-agent-msg system">Click the mic to start talking to Ara</div>
+    </div>
+
+    <div id="voiceAgentBookingArea"></div>
+
+    <div class="voice-agent-status">
+      <span class="voice-agent-status-dot" id="voiceAgentDot"></span>
+      <span id="voiceAgentStatusText">Ready</span>
+    </div>
+  </div>
+</div>
+
+<script src="/voice-agent/voice-booking-agent.js"></script>
+<script>
+(function() {
+  const btn = document.getElementById('voiceAgentBtn');
+  const panel = document.getElementById('voiceAgentPanel');
+  const closeBtn = document.getElementById('voiceAgentClose');
+  const transcript = document.getElementById('voiceAgentTranscript');
+  const dot = document.getElementById('voiceAgentDot');
+  const statusText = document.getElementById('voiceAgentStatusText');
+  const bookingArea = document.getElementById('voiceAgentBookingArea');
+
+  let agent = null;
+  let panelOpen = false;
+
+  function togglePanel() {
+    panelOpen = !panelOpen;
+    panel.classList.toggle('open', panelOpen);
+  }
+
+  function addMessage(role, text) {
+    const div = document.createElement('div');
+    div.className = `voice-agent-msg ${role}`;
+    div.textContent = text;
+    transcript.appendChild(div);
+    transcript.scrollTop = transcript.scrollHeight;
+  }
+
+  function updateStatus(state) {
+    btn.className = 'voice-agent-btn';
+    dot.className = 'voice-agent-status-dot';
+
+    switch (state) {
+      case 'connecting':
+        btn.classList.add('connecting');
+        dot.classList.add('connecting');
+        statusText.textContent = 'Connecting to Ara...';
+        break;
+      case 'listening':
+        btn.classList.add('listening');
+        dot.classList.add('active');
+        statusText.textContent = 'Listening — speak now';
+        break;
+      case 'user_speaking':
+        btn.classList.add('listening');
+        dot.classList.add('active');
+        statusText.textContent = 'Listening — speak now';
+        break;
+      case 'processing':
+        dot.classList.add('active');
+        statusText.textContent = 'Ara is thinking...';
+        break;
+      case 'error':
+        dot.classList.add('error');
+        statusText.textContent = 'Something went wrong. Try again.';
+        break;
+      case 'disconnected':
+        statusText.textContent = 'Disconnected';
+        break;
+      default:
+        statusText.textContent = 'Ready';
+    }
+  }
+
+  function showBookingConfirmed(result) {
+    bookingArea.innerHTML = `
+      <div class="voice-agent-booking">
+        <strong>✓ Message Saved</strong>
+        <p>${result.message}</p>
+      </div>
+    `;
+  }
+
+  async function startAgent() {
+    if (agent) {
+      agent.stop();
+      agent = null;
+      updateStatus('disconnected');
+      btn.textContent = '🎙️';
+      return;
+    }
+
+    try {
+      agent = new VoiceBookingAgent({
+        apiBase: '',
+        onStateChange: updateStatus,
+        onTranscript: (msg) => {
+          if (msg.done && msg.text) {
+            addMessage(msg.role, msg.text);
+          }
+        },
+        onError: (err) => {
+          addMessage('system', 'Error: ' + err);
+        },
+        onBookingConfirmed: showBookingConfirmed
+      });
+
+      await agent.start();
+      btn.textContent = '⏹';
+      addMessage('system', 'Ara is connected. You can speak now.');
+    } catch (err) {
+      addMessage('system', 'Could not connect. Please try again.');
+      updateStatus('error');
+      agent = null;
+      btn.textContent = '🎙️';
+    }
+  }
+
+  btn.addEventListener('click', () => {
+    if (!panelOpen) {
+      togglePanel();
+    }
+    startAgent();
+  });
+
+  closeBtn.addEventListener('click', () => {
+    if (agent) {
+      agent.stop();
+      agent = null;
+      btn.textContent = '🎙️';
+      updateStatus('disconnected');
+    }
+    togglePanel();
+  });
+})();
+</script>

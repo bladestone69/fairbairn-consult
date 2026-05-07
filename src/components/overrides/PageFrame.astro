@@ -1,0 +1,12 @@
+---
+import DefaultPageFrame from '@astrojs/starlight/components/PageFrame.astro';
+import VoiceAgentWidget from '../VoiceAgentWidget.astro';
+const { hasSidebar } = Astro.locals.starlightRoute;
+---
+
+<DefaultPageFrame hasSidebar={hasSidebar}>
+  <slot name="header" />
+  {hasSidebar && <slot name="sidebar" />}
+  <slot />
+</DefaultPageFrame>
+<VoiceAgentWidget />
