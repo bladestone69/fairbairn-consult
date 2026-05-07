@@ -2,6 +2,9 @@
  * Erenst Meyer Financial Advisor — Voice Booking Agent Widget
  * Based on xAI's official Web Agent example
  * Connects to xAI Grok Voice Agent via WebSocket using ephemeral tokens
+ *
+ * Key design: mic audio streams continuously to server (server_vad handles turn detection).
+ * No client-side gating of mic audio. The server decides when the user is speaking.
  */
 
 class VoiceBookingAgent {
@@ -14,16 +17,16 @@ class VoiceBookingAgent {
     this.mediaStream = null;
     this.processorNode = null;
     this.sourceNode = null;
+    this.silentGainNode = null;
     this.playbackQueue = [];
     this.isPlaying = false;
     this.currentPlaybackSource = null;
     this.isSessionConfigured = false;
-    this.sampleRate = 24000; // will be overridden by native rate
+    this.sampleRate = 24000;
     this.audioBuffer = [];
     this.totalSamples = 0;
-    this.chunkSizeSamples = 2400; // 100ms at 24kHz, adjusted on init
-    this._shouldSendAudio = false;
-    this.silentGainNode = null;
+    this.chunkSizeSamples = 2400;
+    this._micReady = false;
     this.onStateChange = options.onStateChange || (() => {});
     this.onTranscript = options.onTranscript || (() => {});
     this.onError = options.onError || (() => {});
@@ -41,7 +44,6 @@ class VoiceBookingAgent {
         throw new Error('Failed to create session: ' + errText);
       }
       const tokenData = await tokenRes.json();
-      // Response format: { client_secret: { value: "...", expires_at: ... } } or { value: "...", expires_at: ... }
       const ephemeralToken = tokenData.client_secret?.value || tokenData.value;
       if (!ephemeralToken) {
         console.error('[Ara] Token response:', tokenData);
@@ -52,14 +54,14 @@ class VoiceBookingAgent {
       // 2. Initialize AudioContext with native sample rate
       this.audioContext = new AudioContext();
       this.sampleRate = this.audioContext.sampleRate;
-      this.chunkSizeSamples = Math.floor(this.sampleRate * 0.1); // 100ms chunks
+      this.chunkSizeSamples = Math.floor(this.sampleRate * 0.1);
       console.log('[Ara] Native sample rate:', this.sampleRate);
 
       if (this.audioContext.state === 'suspended') {
         await this.audioContext.resume();
       }
 
-      // 3. Connect to xAI Voice Agent
+      // 3. Connect to xAI Voice Agent with correct subprotocols
       const wsUrl = `wss://api.x.ai/v1/realtime?model=${this.model}`;
       this.ws = new WebSocket(wsUrl, [
         'realtime',
@@ -85,7 +87,7 @@ class VoiceBookingAgent {
 
   _sendSessionUpdate() {
     console.log('[Ara] Configuring session...');
-    const config = {
+    this.ws.send(JSON.stringify({
       type: 'session.update',
       session: {
         voice: this.voice,
@@ -162,19 +164,14 @@ Keep your responses short and conversational since they are spoken aloud.`,
           }
         }
       }
-    };
-
-    this.ws.send(JSON.stringify(config));
+    }));
   }
 
   _sendInitialGreeting() {
-    console.log('[Ara] Session configured, sending greeting...');
-
-    // Clear any audio that may have been buffered during mic setup
-    // (the onaudioprocess may have sent a few chunks between mic start and now)
+    console.log('[Ara] Sending initial greeting...');
+    // Clear any audio that leaked during setup
     this.ws.send(JSON.stringify({ type: 'input_audio_buffer.clear' }));
-
-    // Send a text greeting to kick off the conversation
+    // Send a text message to kick off the conversation
     this.ws.send(JSON.stringify({
       type: 'conversation.item.create',
       item: {
@@ -183,19 +180,17 @@ Keep your responses short and conversational since they are spoken aloud.`,
         content: [{ type: 'input_text', text: 'Hello' }]
       }
     }));
-
     this.ws.send(JSON.stringify({ type: 'response.create' }));
   }
 
   async _setupMicrophone() {
-    // Ensure audio context is running before requesting mic
+    // Ensure audio context is running
     if (this.audioContext.state === 'suspended') {
       await this.audioContext.resume();
     }
 
     this.mediaStream = await navigator.mediaDevices.getUserMedia({
       audio: {
-        sampleRate: this.sampleRate,
         channelCount: 1,
         echoCancellation: true,
         noiseSuppression: true,
@@ -205,26 +200,22 @@ Keep your responses short and conversational since they are spoken aloud.`,
 
     this.sourceNode = this.audioContext.createMediaStreamSource(this.mediaStream);
 
-    // Use ScriptProcessorNode (same approach as xAI's official example)
+    // ScriptProcessorNode — same approach as xAI's official example
     const bufferSize = 4096;
     this.processorNode = this.audioContext.createScriptProcessor(bufferSize, 1, 1);
 
-    // Create a silent gain node to keep the processor alive without
-    // routing mic audio to speakers (avoids echo/feedback loop)
+    // Silent gain node: keeps processor alive but doesn't output mic to speakers
     this.silentGainNode = this.audioContext.createGain();
     this.silentGainNode.gain.value = 0;
 
     this.audioBuffer = [];
     this.totalSamples = 0;
-
-    // Track whether we should be sending audio (only when server is listening)
-    this._shouldSendAudio = false;
+    this._micReady = false;
 
     this.processorNode.onaudioprocess = (event) => {
-      // Always check that ws exists and is open
+      // Only send audio after mic is fully set up and session is ready
+      if (!this._micReady) return;
       if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return;
-      // Only send mic audio when the server is in listening mode
-      if (!this._shouldSendAudio) return;
 
       const inputData = event.inputBuffer.getChannelData(0);
 
@@ -276,8 +267,8 @@ Keep your responses short and conversational since they are spoken aloud.`,
       }
     };
 
-    // Connect: source → processor → silent gain → destination
-    // This keeps the processor firing but doesn't output mic audio to speakers
+    // Connect: source → processor → silent gain (0) → destination
+    // Processor fires onaudioprocess but mic audio never reaches speakers
     this.sourceNode.connect(this.processorNode);
     this.processorNode.connect(this.silentGainNode);
     this.silentGainNode.connect(this.audioContext.destination);
@@ -289,24 +280,28 @@ Keep your responses short and conversational since they are spoken aloud.`,
       data = JSON.parse(event.data);
     } catch { return; }
 
-    console.log('[Ara] Event:', data.type);
+    // Don't log audio deltas (too noisy)
+    if (data.type !== 'input_audio_buffer.append' && data.type !== 'response.output_audio.delta') {
+      console.log('[Ara] Event:', data.type, data.error ? data.error : '');
+    }
 
     switch (data.type) {
       case 'conversation.created':
-        console.log('[Ara] Conversation created');
-        // Send session config after conversation is created
+        console.log('[Ara] Conversation created, sending session config...');
         this._sendSessionUpdate();
         break;
 
       case 'session.updated':
-        console.log('[Ara] Session configured');
+        console.log('[Ara] Session configured, setting up mic...');
         if (!this.isSessionConfigured) {
           this.isSessionConfigured = true;
           this._setupMicrophone().then(() => {
-            // Don't set sending audio yet — wait until after initial greeting
-            // The initial greeting is text-based, not audio
             this._sendInitialGreeting();
-            // Set to processing immediately since we just sent response.create
+            // Enable mic audio after a short delay so the text greeting is processed first
+            setTimeout(() => {
+              console.log('[Ara] Mic audio now streaming');
+              this._micReady = true;
+            }, 500);
             this._setState('processing');
           }).catch(err => {
             this._onError('Microphone access denied: ' + err.message);
@@ -345,7 +340,6 @@ Keep your responses short and conversational since they are spoken aloud.`,
         }
         break;
 
-      // Also handle conversation.item.added for user transcript
       case 'conversation.item.added':
         if (data.item?.role === 'user' && data.item?.content) {
           for (const c of data.item.content) {
@@ -361,12 +355,8 @@ Keep your responses short and conversational since they are spoken aloud.`,
         break;
 
       case 'input_audio_buffer.speech_started':
-        // User started speaking — stop playback (interruption)
+        // User started speaking — stop Ara's playback (interruption)
         this._stopPlayback();
-        // Ensure audio context is running
-        if (this.audioContext && this.audioContext.state === 'suspended') {
-          this.audioContext.resume().catch(() => {});
-        }
         this._setState('user_speaking');
         break;
 
@@ -375,19 +365,14 @@ Keep your responses short and conversational since they are spoken aloud.`,
         break;
 
       case 'response.created':
-        // Stop sending mic audio while Ara processes/responds
-        this._shouldSendAudio = false;
         this._setState('processing');
         break;
 
       case 'response.done':
-        // Ara finished speaking — clear any residual audio and start listening
-        this.ws.send(JSON.stringify({ type: 'input_audio_buffer.clear' }));
-        // Resume audio context if it was suspended during playback
+        // Ara finished — ensure audio context is running for mic
         if (this.audioContext && this.audioContext.state === 'suspended') {
           this.audioContext.resume().catch(() => {});
         }
-        this._shouldSendAudio = true;
         this._setState('listening');
         break;
 
@@ -400,7 +385,6 @@ Keep your responses short and conversational since they are spoken aloud.`,
 
   _playAudioChunk(base64Delta) {
     try {
-      // Decode base64 to PCM16 to Float32 for playback at native sample rate
       const binary = atob(base64Delta);
       const bytes = new Uint8Array(binary.length);
       for (let i = 0; i < binary.length; i++) {
@@ -546,13 +530,13 @@ Keep your responses short and conversational since they are spoken aloud.`,
       this.sourceNode.disconnect();
       this.sourceNode = null;
     }
-    if (this.mediaStream) {
-      this.mediaStream.getTracks().forEach(t => t.stop());
-      this.mediaStream = null;
-    }
     if (this.silentGainNode) {
       this.silentGainNode.disconnect();
       this.silentGainNode = null;
+    }
+    if (this.mediaStream) {
+      this.mediaStream.getTracks().forEach(t => t.stop());
+      this.mediaStream = null;
     }
     if (this.audioContext && this.audioContext.state !== 'closed') {
       this.audioContext.close().catch(() => {});
@@ -562,7 +546,7 @@ Keep your responses short and conversational since they are spoken aloud.`,
     this.audioBuffer = [];
     this.totalSamples = 0;
     this.isSessionConfigured = false;
-    this._shouldSendAudio = false;
+    this._micReady = false;
   }
 
   stop() {
