@@ -8,7 +8,8 @@ export default async function handler(req, res) {
 
   const XAI_API_KEY = process.env.XAI_API_KEY;
   if (!XAI_API_KEY) {
-    return res.status(500).json({ error: 'XAI_API_KEY not configured' });
+    console.error('XAI_API_KEY not set in environment');
+    return res.status(500).json({ error: 'XAI_API_KEY not configured on server' });
   }
 
   try {
@@ -19,17 +20,18 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        expires_after: { seconds: 300 } // 5-minute token
+        expires_after: { seconds: 300 }
       }),
     });
 
     if (!response.ok) {
-      const err = await response.text();
-      console.error('xAI ephemeral token error:', err);
-      return res.status(response.status).json({ error: 'Failed to create session' });
+      const errText = await response.text();
+      console.error('xAI ephemeral token error:', response.status, errText);
+      return res.status(response.status).json({ error: 'Failed to create session', details: errText });
     }
 
     const data = await response.json();
+    // xAI returns: { client_secret: { value: "...", expires_at: ... } }
     return res.status(200).json(data);
   } catch (error) {
     console.error('Session creation error:', error);

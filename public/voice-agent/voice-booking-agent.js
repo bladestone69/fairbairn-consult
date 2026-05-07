@@ -1,13 +1,7 @@
 /**
  * Erenst Meyer Financial Advisor — Voice Booking Agent Widget
- * Connects to xAI Grok Voice Agent via WebSocket using ephemeral tokens.
- * 
- * Fixed issues:
- * - Wait for session.created before sending session.update
- * - Proper base64 encoding for large audio chunks
- * - Continuous audio playback (ScriptProcessorNode ring buffer)
- * - Correct PCM format spec for session.update
- * - Commit audio buffer after each utterance with server VAD
+ * Based on xAI's official Web Agent example
+ * Connects to xAI Grok Voice Agent via WebSocket using ephemeral tokens
  */
 
 class VoiceBookingAgent {
@@ -18,15 +12,20 @@ class VoiceBookingAgent {
     this.ws = null;
     this.audioContext = null;
     this.mediaStream = null;
-    this.workletNode = null;
-    this.nextAudioCtx = null; // separate context for playback
+    this.processorNode = null;
+    this.sourceNode = null;
+    this.playbackQueue = [];
     this.isPlaying = false;
-    this.audioChunks = [];
+    this.currentPlaybackSource = null;
+    this.isSessionConfigured = false;
+    this.sampleRate = 24000; // will be overridden by native rate
+    this.audioBuffer = [];
+    this.totalSamples = 0;
+    this.chunkSizeSamples = 2400; // 100ms at 24kHz, adjusted on init
     this.onStateChange = options.onStateChange || (() => {});
     this.onTranscript = options.onTranscript || (() => {});
     this.onError = options.onError || (() => {});
     this.onBookingConfirmed = options.onBookingConfirmed || (() => {});
-    this._sessionReady = false;
   }
 
   async start() {
@@ -35,21 +34,39 @@ class VoiceBookingAgent {
 
       // 1. Get ephemeral token from server
       const tokenRes = await fetch(`${this.apiBase}/api/session`, { method: 'POST' });
-      if (!tokenRes.ok) throw new Error('Failed to create session — check that XAI_API_KEY is set in Vercel env');
+      if (!tokenRes.ok) {
+        const errText = await tokenRes.text();
+        throw new Error('Failed to create session: ' + errText);
+      }
       const tokenData = await tokenRes.json();
+      // Response format: { client_secret: { value: "...", expires_at: ... } } or { value: "...", expires_at: ... }
       const ephemeralToken = tokenData.client_secret?.value || tokenData.value;
-      if (!ephemeralToken) throw new Error('No ephemeral token received from server');
+      if (!ephemeralToken) {
+        console.error('[Ara] Token response:', tokenData);
+        throw new Error('No ephemeral token received');
+      }
+      console.log('[Ara] Ephemeral token received');
 
-      // 2. Create playback audio context (separate from mic context)
-      this.nextAudioCtx = new AudioContext({ sampleRate: 24000 });
+      // 2. Initialize AudioContext with native sample rate
+      this.audioContext = new AudioContext();
+      this.sampleRate = this.audioContext.sampleRate;
+      this.chunkSizeSamples = Math.floor(this.sampleRate * 0.1); // 100ms chunks
+      console.log('[Ara] Native sample rate:', this.sampleRate);
+
+      if (this.audioContext.state === 'suspended') {
+        await this.audioContext.resume();
+      }
 
       // 3. Connect to xAI Voice Agent
       const wsUrl = `wss://api.x.ai/v1/realtime?model=${this.model}`;
-      this.ws = new WebSocket(wsUrl, [`xai-client-secret.${ephemeralToken}`]);
+      this.ws = new WebSocket(wsUrl, [
+        'realtime',
+        `openai-insecure-api-key.${ephemeralToken}`,
+        'openai-beta.realtime-v1'
+      ]);
 
       this.ws.onopen = () => {
         console.log('[Ara] WebSocket connected');
-        // Session config will be sent after session.created event
       };
       this.ws.onmessage = (e) => this._onMessage(e);
       this.ws.onerror = () => this._onError('WebSocket connection error');
@@ -65,7 +82,8 @@ class VoiceBookingAgent {
   }
 
   _sendSessionUpdate() {
-    this.ws.send(JSON.stringify({
+    console.log('[Ara] Configuring session...');
+    const config = {
       type: 'session.update',
       session: {
         voice: this.voice,
@@ -109,6 +127,7 @@ Keep your responses short and conversational since they are spoken aloud.`,
         turn_detection: {
           type: 'server_vad'
         },
+        input_audio_transcription: {},
         tools: [
           {
             type: 'function',
@@ -126,30 +145,49 @@ Keep your responses short and conversational since they are spoken aloud.`,
             }
           }
         ],
-        input_audio_transcription: {},
         audio: {
           input: {
             format: {
-              type: 'pcm16',
-              rate: 24000
+              type: 'audio/pcm',
+              rate: this.sampleRate
             }
           },
           output: {
             format: {
-              type: 'pcm16',
-              rate: 24000
+              type: 'audio/pcm',
+              rate: this.sampleRate
             }
           }
         }
       }
+    };
+
+    this.ws.send(JSON.stringify(config));
+  }
+
+  _sendInitialGreeting() {
+    console.log('[Ara] Session configured, sending greeting...');
+
+    // Commit any pending audio
+    this.ws.send(JSON.stringify({ type: 'input_audio_buffer.commit' }));
+
+    // Send a text greeting to kick off the conversation
+    this.ws.send(JSON.stringify({
+      type: 'conversation.item.create',
+      item: {
+        type: 'message',
+        role: 'user',
+        content: [{ type: 'input_text', text: 'Hello' }]
+      }
     }));
+
+    this.ws.send(JSON.stringify({ type: 'response.create' }));
   }
 
   async _setupMicrophone() {
-    this.audioContext = new AudioContext({ sampleRate: 24000 });
     this.mediaStream = await navigator.mediaDevices.getUserMedia({
       audio: {
-        sampleRate: 24000,
+        sampleRate: this.sampleRate,
         channelCount: 1,
         echoCancellation: true,
         noiseSuppression: true,
@@ -157,22 +195,54 @@ Keep your responses short and conversational since they are spoken aloud.`,
       }
     });
 
-    const source = this.audioContext.createMediaStreamSource(this.mediaStream);
+    this.sourceNode = this.audioContext.createMediaStreamSource(this.mediaStream);
 
-    await this.audioContext.audioWorklet.addModule('/voice-agent/audio-processor.js');
-    this.workletNode = new AudioWorkletNode(this.audioContext, 'pcm-processor');
+    // Use ScriptProcessorNode (same as xAI's official example)
+    const bufferSize = 4096;
+    this.processorNode = this.audioContext.createScriptProcessor(bufferSize, 1, 1);
 
-    this.workletNode.port.onmessage = (e) => {
-      if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-        const float32 = e.data;
-        // Convert Float32 to Int16 PCM
-        const int16 = new Int16Array(float32.length);
-        for (let i = 0; i < float32.length; i++) {
-          const s = Math.max(-1, Math.min(1, float32[i]));
-          int16[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+    this.audioBuffer = [];
+    this.totalSamples = 0;
+
+    this.processorNode.onaudioprocess = (event) => {
+      if (!this.ws || this.ws.readyState !== WebSocket.OPEN || !this.isSessionConfigured) return;
+
+      const inputData = event.inputBuffer.getChannelData(0);
+
+      // Buffer audio data
+      this.audioBuffer.push(new Float32Array(inputData));
+      this.totalSamples += inputData.length;
+
+      // Send chunks of ~100ms
+      while (this.totalSamples >= this.chunkSizeSamples) {
+        const chunk = new Float32Array(this.chunkSizeSamples);
+        let offset = 0;
+
+        while (offset < this.chunkSizeSamples && this.audioBuffer.length > 0) {
+          const buf = this.audioBuffer[0];
+          const needed = this.chunkSizeSamples - offset;
+          const available = buf.length;
+
+          if (available <= needed) {
+            chunk.set(buf, offset);
+            offset += available;
+            this.totalSamples -= available;
+            this.audioBuffer.shift();
+          } else {
+            chunk.set(buf.subarray(0, needed), offset);
+            this.audioBuffer[0] = buf.subarray(needed);
+            offset += needed;
+            this.totalSamples -= needed;
+          }
         }
-        // Proper base64 encoding (avoid stack overflow on large chunks)
-        const bytes = new Uint8Array(int16.buffer);
+
+        // Convert Float32 to PCM16 and base64 encode
+        const pcm16 = new Int16Array(chunk.length);
+        for (let i = 0; i < chunk.length; i++) {
+          const s = Math.max(-1, Math.min(1, chunk[i]));
+          pcm16[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+        }
+        const bytes = new Uint8Array(pcm16.buffer);
         let binary = '';
         const chunkSize = 0x8000;
         for (let i = 0; i < bytes.length; i += chunkSize) {
@@ -187,62 +257,77 @@ Keep your responses short and conversational since they are spoken aloud.`,
       }
     };
 
-    source.connect(this.workletNode);
-    // Don't connect workletNode to destination — we don't want mic audio playing through speakers
+    this.sourceNode.connect(this.processorNode);
+    this.processorNode.connect(this.audioContext.destination);
   }
 
   _onMessage(event) {
     let data;
     try {
       data = JSON.parse(event.data);
-    } catch {
-      return;
-    }
+    } catch { return; }
 
     console.log('[Ara] Event:', data.type);
 
     switch (data.type) {
-      case 'session.created':
-        console.log('[Ara] Session created, sending config...');
+      case 'conversation.created':
+        console.log('[Ara] Conversation created');
+        // Send session config after conversation is created
         this._sendSessionUpdate();
         break;
 
       case 'session.updated':
         console.log('[Ara] Session configured');
-        this._sessionReady = true;
-        // Now set up the microphone
-        this._setupMicrophone().then(() => {
-          this._setState('listening');
-        }).catch(err => {
-          this._onError('Microphone access denied: ' + err.message);
-        });
+        if (!this.isSessionConfigured) {
+          this.isSessionConfigured = true;
+          this._setupMicrophone().then(() => {
+            this._sendInitialGreeting();
+            this._setState('listening');
+          }).catch(err => {
+            this._onError('Microphone access denied: ' + err.message);
+          });
+        }
         break;
 
-      case 'response.audio.delta':
-        // Incoming audio chunk from Grok — play it
-        this._playAudioChunk(data.delta);
+      // Incoming audio from Grok
+      case 'response.output_audio.delta':
+        if (data.delta) {
+          this._playAudioChunk(data.delta);
+        }
         break;
 
-      case 'response.audio.done':
-        // Audio response complete
+      case 'response.output_audio.done':
         this._flushAudio();
         break;
 
-      case 'response.text.delta':
+      // Transcript of assistant's spoken response
+      case 'response.output_audio_transcript.delta':
         if (data.delta) {
           this.onTranscript({ role: 'assistant', text: data.delta, done: false });
         }
         break;
 
-      case 'response.text.done':
+      case 'response.output_audio_transcript.done':
         if (data.text) {
           this.onTranscript({ role: 'assistant', text: data.text, done: true });
         }
         break;
 
+      // User speech transcript
       case 'conversation.item.input_audio_transcription.completed':
         if (data.transcript) {
           this.onTranscript({ role: 'user', text: data.transcript, done: true });
+        }
+        break;
+
+      // Also handle conversation.item.added for user transcript
+      case 'conversation.item.added':
+        if (data.item?.role === 'user' && data.item?.content) {
+          for (const c of data.item.content) {
+            if (c.type === 'input_audio' && c.transcript) {
+              this.onTranscript({ role: 'user', text: c.transcript, done: true });
+            }
+          }
         }
         break;
 
@@ -251,6 +336,8 @@ Keep your responses short and conversational since they are spoken aloud.`,
         break;
 
       case 'input_audio_buffer.speech_started':
+        // User started speaking — stop playback (interruption)
+        this._stopPlayback();
         this._setState('user_speaking');
         break;
 
@@ -270,73 +357,86 @@ Keep your responses short and conversational since they are spoken aloud.`,
         console.error('[Ara] Error event:', data);
         this._onError(data.error?.message || 'Voice agent error');
         break;
-
-      default:
-        // Log unhandled events for debugging
-        break;
     }
   }
 
   _playAudioChunk(base64Delta) {
     try {
+      // Decode base64 to PCM16 to Float32 for playback at native sample rate
       const binary = atob(base64Delta);
       const bytes = new Uint8Array(binary.length);
       for (let i = 0; i < binary.length; i++) {
         bytes[i] = binary.charCodeAt(i);
       }
-
-      // Convert Int16 PCM to Float32 for AudioContext playback
-      const int16 = new Int16Array(bytes.buffer);
-      const float32 = new Float32Array(int16.length);
-      for (let i = 0; i < int16.length; i++) {
-        float32[i] = int16[i] / (int16[i] < 0 ? 0x8000 : 0x7FFF);
+      const pcm16 = new Int16Array(bytes.buffer);
+      const float32 = new Float32Array(pcm16.length);
+      for (let i = 0; i < pcm16.length; i++) {
+        float32[i] = pcm16[i] / (pcm16[i] < 0 ? 0x8000 : 0x7FFF);
       }
 
-      this.audioChunks.push(float32);
+      this.playbackQueue.push(float32);
 
-      // Start playing if not already
       if (!this.isPlaying) {
-        this._schedulePlayback();
+        this._playNextChunk();
       }
     } catch (err) {
       console.error('[Ara] Audio decode error:', err);
     }
   }
 
-  _schedulePlayback() {
-    if (this.audioChunks.length === 0) {
+  _playNextChunk() {
+    if (this.playbackQueue.length === 0) {
       this.isPlaying = false;
+      this.currentPlaybackSource = null;
       return;
     }
 
     this.isPlaying = true;
-    const float32 = this.audioChunks.shift();
+    const float32 = this.playbackQueue.shift();
 
-    if (!this.nextAudioCtx || this.nextAudioCtx.state === 'closed') {
+    if (!this.audioContext || this.audioContext.state === 'closed') {
       this.isPlaying = false;
       return;
     }
 
-    // Resume context if suspended (browser autoplay policy)
-    if (this.nextAudioCtx.state === 'suspended') {
-      this.nextAudioCtx.resume();
+    if (this.audioContext.state === 'suspended') {
+      this.audioContext.resume();
     }
 
-    const buffer = this.nextAudioCtx.createBuffer(1, float32.length, 24000);
+    const buffer = this.audioContext.createBuffer(1, float32.length, this.sampleRate);
     buffer.getChannelData(0).set(float32);
 
-    const source = this.nextAudioCtx.createBufferSource();
+    const source = this.audioContext.createBufferSource();
     source.buffer = buffer;
-    source.connect(this.nextAudioCtx.destination);
-    source.onended = () => this._schedulePlayback();
+    source.connect(this.audioContext.destination);
+    this.currentPlaybackSource = source;
+
+    source.onended = () => {
+      if (this.currentPlaybackSource === source) {
+        this.currentPlaybackSource = null;
+      }
+      this._playNextChunk();
+    };
+
     source.start();
   }
 
   _flushAudio() {
-    // Play any remaining chunks
-    if (this.audioChunks.length > 0 && !this.isPlaying) {
-      this._schedulePlayback();
+    if (this.playbackQueue.length > 0 && !this.isPlaying) {
+      this._playNextChunk();
     }
+  }
+
+  _stopPlayback() {
+    if (this.currentPlaybackSource) {
+      try {
+        this.currentPlaybackSource.stop();
+        this.currentPlaybackSource.disconnect();
+      } catch {}
+      this.currentPlaybackSource = null;
+    }
+    this.playbackQueue = [];
+    this.isPlaying = false;
   }
 
   async _handleToolCall(data) {
@@ -369,7 +469,6 @@ Keep your responses short and conversational since they are spoken aloud.`,
       result = { error: 'Unknown function: ' + data.name };
     }
 
-    // Send tool result back to Grok
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify({
         type: 'conversation.item.create',
@@ -399,25 +498,28 @@ Keep your responses short and conversational since they are spoken aloud.`,
   }
 
   _cleanup() {
+    this._stopPlayback();
+
+    if (this.processorNode) {
+      this.processorNode.disconnect();
+      this.processorNode = null;
+    }
+    if (this.sourceNode) {
+      this.sourceNode.disconnect();
+      this.sourceNode = null;
+    }
     if (this.mediaStream) {
       this.mediaStream.getTracks().forEach(t => t.stop());
       this.mediaStream = null;
-    }
-    if (this.workletNode) {
-      this.workletNode.disconnect();
-      this.workletNode = null;
     }
     if (this.audioContext && this.audioContext.state !== 'closed') {
       this.audioContext.close().catch(() => {});
       this.audioContext = null;
     }
-    if (this.nextAudioCtx && this.nextAudioCtx.state !== 'closed') {
-      this.nextAudioCtx.close().catch(() => {});
-      this.nextAudioCtx = null;
-    }
-    this.audioChunks = [];
-    this.isPlaying = false;
-    this._sessionReady = false;
+    this.playbackQueue = [];
+    this.audioBuffer = [];
+    this.totalSamples = 0;
+    this.isSessionConfigured = false;
   }
 
   stop() {
