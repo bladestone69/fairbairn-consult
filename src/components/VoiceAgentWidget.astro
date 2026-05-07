@@ -81,7 +81,7 @@
         break;
       case 'processing':
         dot.classList.add('active');
-        statusText.textContent = 'Ara is thinking...';
+        statusText.textContent = 'Ara is speaking...';
         break;
       case 'error':
         dot.classList.add('error');
@@ -99,6 +99,9 @@
     bookingArea.innerHTML = '<div class="voice-agent-booking"><strong>✓ Message Saved</strong><p>' + result.message + '</p></div>';
   }
 
+  // Accumulate transcript deltas
+  let currentAssistantText = '';
+
   async function startAgent() {
     if (agent) {
       agent.stop();
@@ -113,8 +116,22 @@
         apiBase: '',
         onStateChange: updateStatus,
         onTranscript: function(msg) {
-          if (msg.done && msg.text) {
-            addMessage(msg.role, msg.text);
+          if (msg.role === 'user' && msg.done && msg.text) {
+            addMessage('user', msg.text);
+          } else if (msg.role === 'assistant') {
+            if (!msg.done) {
+              // Delta — accumulate
+              currentAssistantText += msg.text;
+            } else {
+              // Done — show full message
+              if (msg.text) {
+                currentAssistantText = msg.text;
+              }
+              if (currentAssistantText) {
+                addMessage('assistant', currentAssistantText);
+                currentAssistantText = '';
+              }
+            }
           }
         },
         onError: function(err) {
@@ -127,7 +144,7 @@
       btn.textContent = '⏹';
       addMessage('system', 'Ara is connected. You can speak now.');
     } catch (err) {
-      addMessage('system', 'Could not connect. Please try again.');
+      addMessage('system', 'Could not connect: ' + err.message);
       updateStatus('error');
       agent = null;
       btn.textContent = '🎙️';
