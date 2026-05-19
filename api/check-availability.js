@@ -1,26 +1,26 @@
 // Vercel Serverless Function: Check available time slots
 // Called by the Grok Voice Agent as a custom function tool.
 
+import { applyRateLimit, cleanText, methodNotAllowed, noStore, parseBody } from './_utils.js';
+
 // Available business hours: Mon-Fri 8:00-17:00 SAST (Africa/Johannesburg)
 const BUSINESS_HOURS = { start: 8, end: 17 };
-const SLOT_DURATION_MINUTES = 60;
-
-// In-memory booked slots for demo. Replace with real calendar integration.
-const bookedSlots = [];
 
 export default async function handler(req, res) {
+  noStore(res);
+
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return methodNotAllowed(res);
   }
 
-  const API_SECRET = process.env.BOOKING_API_SECRET || 'changeme-setup-env-var';
-  if (req.headers['x-booking-secret'] !== API_SECRET) {
-    return res.status(403).json({ error: 'Unauthorized' });
+  if (!applyRateLimit(req, res, { scope: 'availability', max: 20 })) {
+    return res.status(429).json({ error: 'Too many requests. Please try again later.' });
   }
 
-  const { date } = req.body;
+  const { date: rawDate } = parseBody(req);
+  const date = cleanText(rawDate, 20);
 
-  if (!date) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
     return res.status(400).json({ error: 'date is required (YYYY-MM-DD)' });
   }
 
@@ -50,10 +50,7 @@ export default async function handler(req, res) {
   const available = [];
   for (let hour = BUSINESS_HOURS.start; hour < BUSINESS_HOURS.end; hour++) {
     const timeStr = `${String(hour).padStart(2, '0')}:00`;
-    const slotId = `${date}_${timeStr}`;
-    if (!bookedSlots.includes(slotId)) {
-      available.push(timeStr);
-    }
+    available.push(timeStr);
   }
 
   // If date is today, remove past slots

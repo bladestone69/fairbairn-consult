@@ -10,6 +10,36 @@ export default defineConfig({
       description: 'Personal financial advice with structured long-term support',
       favicon: '/favicon.svg',
       social: [],
+      head: [
+        {
+          tag: 'meta',
+          attrs: {
+            property: 'og:image',
+            content: 'https://www.financial-advisor.co.za/brand-assets/social-card.svg',
+          },
+        },
+        {
+          tag: 'meta',
+          attrs: {
+            property: 'og:image:alt',
+            content: 'Erenst Meyer Financial Advisor - personal financial advice with structured long-term support',
+          },
+        },
+        {
+          tag: 'meta',
+          attrs: {
+            name: 'twitter:image',
+            content: 'https://www.financial-advisor.co.za/brand-assets/social-card.svg',
+          },
+        },
+        {
+          tag: 'meta',
+          attrs: {
+            name: 'theme-color',
+            content: '#251f1b',
+          },
+        },
+      ],
       customCss: ['./src/styles/custom.css'],
       components: {
         PageFrame: './src/components/overrides/PageFrame.astro',
@@ -37,6 +67,12 @@ export default defineConfig({
           label: 'Reviews',
           items: [
             { label: 'Ongoing Review Service', slug: 'reviews' },
+          ],
+        },
+        {
+          label: 'Planning Tools',
+          items: [
+            { label: 'Interactive Calculators', slug: 'planning-tools' },
           ],
         },
         {

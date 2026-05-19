@@ -468,20 +468,18 @@ Keep your responses short and conversational since they are spoken aloud.`,
     } catch {}
 
     let result;
-    const secret = 'changeme-setup-env-var';
 
     if (data.name === 'save_callback_request') {
       try {
         const res = await fetch(`${this.apiBase}/api/callback-request`, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
-            'x-booking-secret': secret
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify(args)
         });
         result = await res.json();
-        if (result.success) {
+        if (res.ok && result.success) {
           this.onBookingConfirmed(result);
         }
       } catch (err) {

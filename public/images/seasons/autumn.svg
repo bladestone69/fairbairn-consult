@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="Autumn landscape">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f1c58d"/>
+      <stop offset="0.55" stop-color="#c96d45"/>
+      <stop offset="1" stop-color="#5a2b35"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="18%" cy="22%" r="50%">
+      <stop offset="0" stop-color="#ffe8bc" stop-opacity="0.86"/>
+      <stop offset="1" stop-color="#ffe8bc" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#sky)"/>
+  <rect width="1600" height="900" fill="url(#glow)"/>
+  <path d="M0 590c210-46 370-18 510 56 168 88 362 96 590 6 180-72 330-82 500-22v270H0Z" fill="#8b2d6f" opacity="0.32"/>
+  <path d="M0 700c190-70 365-62 560-6 210 60 430 46 626-34 156-64 288-74 414-32v272H0Z" fill="#2b2622" opacity="0.84"/>
+  <g fill="#f59a2a" opacity="0.52">
+    <circle cx="260" cy="635" r="9"/>
+    <circle cx="465" cy="686" r="6"/>
+    <circle cx="1120" cy="640" r="8"/>
+    <circle cx="1390" cy="670" r="5"/>
+  </g>
+</svg>

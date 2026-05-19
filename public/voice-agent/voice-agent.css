@@ -255,3 +255,18 @@
     right: 16px;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .voice-agent-btn,
+  .voice-agent-panel.open,
+  .voice-agent-msg,
+  .voice-agent-status-dot.active,
+  .voice-agent-booking {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .voice-agent-btn:hover {
+    transform: none;
+  }
+}

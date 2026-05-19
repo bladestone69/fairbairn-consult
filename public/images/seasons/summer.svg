@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="Warm summer landscape">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f7d488"/>
+      <stop offset="0.5" stop-color="#e9a857"/>
+      <stop offset="1" stop-color="#6fb7b2"/>
+    </linearGradient>
+    <radialGradient id="light" cx="72%" cy="18%" r="46%">
+      <stop offset="0" stop-color="#fff7dc" stop-opacity="0.92"/>
+      <stop offset="1" stop-color="#fff7dc" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#sky)"/>
+  <rect width="1600" height="900" fill="url(#light)"/>
+  <path d="M0 620c190-70 350-82 500-38 180 52 355 34 532-44 230-102 410-78 568 18v344H0Z" fill="#8b6a3d" opacity="0.48"/>
+  <path d="M0 725c270-82 520-76 748-18 210 54 405 42 620-40 90-34 168-42 232-30v263H0Z" fill="#2b332b" opacity="0.78"/>
+  <path d="M0 805h1600v95H0Z" fill="#181411" opacity="0.30"/>
+</svg>

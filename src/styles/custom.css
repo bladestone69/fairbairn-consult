@@ -54,7 +54,7 @@ body::before {
   pointer-events: none;
   background:
     linear-gradient(180deg, rgba(18, 15, 13, 0.58), rgba(18, 15, 13, 0.82)),
-    url('/images/seasons/spring.jpg') center / cover no-repeat;
+    url('/images/seasons/spring.svg') center / cover no-repeat;
   opacity: .16;
   filter: saturate(.9) blur(2px);
   z-index: -2;
@@ -222,22 +222,22 @@ button[aria-label*="sidebar"],
 }
 
 .season-spring {
-  background-image: url('/images/seasons/spring.jpg');
+  background-image: url('/images/seasons/spring.svg');
   animation-delay: 0s;
 }
 
 .season-summer {
-  background-image: url('/images/seasons/summer.jpg');
+  background-image: url('/images/seasons/summer.svg');
   animation-delay: 8s;
 }
 
 .season-autumn {
-  background-image: url('/images/seasons/autumn.jpg');
+  background-image: url('/images/seasons/autumn.svg');
   animation-delay: 16s;
 }
 
 .season-winter {
-  background-image: url('/images/seasons/winter.jpg');
+  background-image: url('/images/seasons/winter.svg');
   animation-delay: 24s;
 }
 
@@ -614,16 +614,15 @@ button[aria-label*="sidebar"],
   padding: 1rem;
 }
 
-.advisor-photo-placeholder {
-  width: 84px;
-  height: 84px;
+.advisor-photo {
+  width: 96px;
+  height: 96px;
   border-radius: 50%;
-  display: grid;
-  place-items: center;
-  font-weight: 800;
-  font-size: 1.6rem;
-  color: #132126;
+  display: block;
+  object-fit: cover;
   background: linear-gradient(135deg, var(--sl-color-accent), #f1d7a8);
+  border: 2px solid rgba(244, 236, 223, .28);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .24);
 }
 
 .feature-block {
@@ -952,11 +951,11 @@ button[aria-label*="sidebar"],
   animation: fadeSlideUp 0.7s ease-out 0.3s both, breathe 6s ease-in-out 2s infinite;
 }
 
-.advisor-photo-placeholder {
+.advisor-photo {
   transition: transform 0.4s ease, box-shadow 0.4s ease;
 }
 
-.advisor-photo-card:hover .advisor-photo-placeholder {
+.advisor-photo-card:hover .advisor-photo {
   transform: scale(1.08) rotate(2deg);
   box-shadow: 0 8px 24px rgba(111, 183, 178, 0.25);
 }
@@ -1230,5 +1229,159 @@ html {
   .hero-premium::before,
   .hero::after {
     animation: none !important;
+  }
+}
+
+/* === PUBLIC SITE CHROME === */
+.public-nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .85rem clamp(1rem, 4vw, 2.5rem);
+  background: rgba(31, 27, 24, 0.92);
+  border-bottom: 1px solid rgba(244, 236, 223, 0.10);
+  backdrop-filter: blur(16px);
+}
+
+.public-nav__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: .75rem;
+  color: var(--text-main);
+  text-decoration: none;
+  min-width: fit-content;
+}
+
+.public-nav__brand strong,
+.public-nav__brand small {
+  display: block;
+}
+
+.public-nav__brand small {
+  color: var(--text-muted);
+  font-size: .78rem;
+  line-height: 1.1;
+}
+
+.public-nav__mark {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #132126;
+  background: linear-gradient(135deg, var(--sl-color-accent), #f1d7a8);
+  font-weight: 800;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, .20);
+}
+
+.public-nav__links {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: .35rem;
+}
+
+.public-nav__links a {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: .92rem;
+  padding: .55rem .75rem;
+  border-radius: 999px;
+  transition: color .18s ease, background-color .18s ease;
+}
+
+.public-nav__links a:hover,
+.public-nav__links a[aria-current='page'] {
+  color: #132126;
+  background: var(--sl-color-accent);
+}
+
+.global-footer {
+  max-width: 78rem;
+  margin: 3rem auto 0;
+  padding: 2rem clamp(1rem, 4vw, 2rem) 1.5rem;
+}
+
+.global-footer .footer-grid {
+  grid-template-columns: 1.35fr 1fr 1fr 1.2fr;
+}
+
+.global-footer a {
+  overflow-wrap: anywhere;
+}
+
+/* Calmer production motion defaults */
+.hero::after,
+.hero-premium::before,
+.season-frame,
+.motion-pill,
+.hero .cta-row .primary,
+.advisor-photo-card,
+.hero-proof .proof-card:nth-child(1),
+.hero-proof .proof-card:nth-child(2),
+.hero-proof .proof-card:nth-child(3) {
+  animation-iteration-count: 1;
+}
+
+.season-frame {
+  animation-duration: 56s, 32s;
+}
+
+.motion-pill {
+  animation: none;
+}
+
+.advisor-photo-card {
+  animation: fadeSlideUp 0.7s ease-out 0.3s both;
+}
+
+.hero-proof .proof-card:nth-child(1) {
+  animation: fadeSlideUp 0.6s ease-out 0.4s both;
+}
+
+.hero-proof .proof-card:nth-child(2) {
+  animation: fadeSlideUp 0.6s ease-out 0.5s both;
+}
+
+.hero-proof .proof-card:nth-child(3) {
+  animation: fadeSlideUp 0.6s ease-out 0.6s both;
+}
+
+.hero .cta-row .primary,
+.hero::after,
+.hero-premium::before {
+  animation: none;
+}
+
+@media (max-width: 900px) {
+  .public-nav {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .public-nav__links {
+    justify-content: flex-start;
+  }
+
+  .global-footer .footer-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .public-nav__links {
+    gap: .25rem;
+  }
+
+  .public-nav__links a {
+    font-size: .86rem;
+    padding: .5rem .6rem;
   }
 }
