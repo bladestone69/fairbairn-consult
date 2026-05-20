@@ -1,15 +1,14 @@
 ---
 import DefaultPageFrame from '@astrojs/starlight/components/PageFrame.astro';
 import VoiceAgentWidget from '../VoiceAgentWidget.astro';
-const { hasSidebar } = Astro.locals.starlightRoute;
 const currentPath = Astro.url.pathname;
 const navItems = [
   { label: 'Home', href: '/' },
   { label: 'About', href: '/about/' },
   { label: 'Services', href: '/services/' },
-  { label: 'Advice Process', href: '/advice-process/' },
-  { label: 'Planning Tools', href: '/planning-tools/' },
-  { label: 'Documents', href: '/documents/' },
+  { label: 'Advice', href: '/advice-process/' },
+  { label: 'Tools', href: '/planning-tools/' },
+  { label: 'Docs', href: '/documents/' },
   { label: 'Contact', href: '/contact/' },
 ];
 
@@ -66,9 +65,7 @@ const structuredData = {
   </div>
 </nav>
 
-<DefaultPageFrame hasSidebar={hasSidebar}>
-  <slot name="header" />
-  {hasSidebar && <slot name="sidebar" />}
+<DefaultPageFrame hasSidebar={false}>
   <slot />
 </DefaultPageFrame>
 <footer class="site-footer global-footer">

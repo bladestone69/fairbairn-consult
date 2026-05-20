@@ -1234,17 +1234,15 @@ html {
 
 /* === PUBLIC SITE CHROME === */
 .public-nav {
-  position: sticky;
-  top: 0;
+  position: relative;
   z-index: 20;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-  padding: .85rem clamp(1rem, 4vw, 2.5rem);
-  background: rgba(31, 27, 24, 0.92);
-  border-bottom: 1px solid rgba(244, 236, 223, 0.10);
-  backdrop-filter: blur(16px);
+  gap: 1.25rem;
+  padding: .7rem clamp(1rem, 4vw, 2rem);
+  background: rgba(25, 21, 18, 0.96);
+  border-bottom: 1px solid rgba(244, 236, 223, 0.08);
 }
 
 .public-nav__brand {
@@ -1268,8 +1266,8 @@ html {
 }
 
 .public-nav__mark {
-  width: 42px;
-  height: 42px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   display: grid;
   place-items: center;
@@ -1283,16 +1281,24 @@ html {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  flex-wrap: wrap;
-  gap: .35rem;
+  flex: 1;
+  gap: .2rem;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  white-space: nowrap;
+}
+
+.public-nav__links::-webkit-scrollbar {
+  display: none;
 }
 
 .public-nav__links a {
   color: var(--text-muted);
   text-decoration: none;
   font-weight: 700;
-  font-size: .92rem;
-  padding: .55rem .75rem;
+  font-size: .9rem;
+  padding: .5rem .68rem;
   border-radius: 999px;
   transition: color .18s ease, background-color .18s ease;
 }
@@ -1301,6 +1307,12 @@ html {
 .public-nav__links a[aria-current='page'] {
   color: #132126;
   background: var(--sl-color-accent);
+}
+
+.public-nav__links a[href='/contact/'] {
+  margin-left: .25rem;
+  color: #132126;
+  background: #f1d7a8;
 }
 
 .global-footer {
@@ -1362,8 +1374,8 @@ html {
 
 @media (max-width: 900px) {
   .public-nav {
-    align-items: flex-start;
-    flex-direction: column;
+    gap: .75rem;
+    padding: .65rem .85rem;
   }
 
   .public-nav__links {
@@ -1376,12 +1388,22 @@ html {
 }
 
 @media (max-width: 520px) {
+  .public-nav {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .public-nav__brand {
+    width: 100%;
+  }
+
   .public-nav__links {
-    gap: .25rem;
+    width: 100%;
+    padding-bottom: .1rem;
   }
 
   .public-nav__links a {
-    font-size: .86rem;
-    padding: .5rem .6rem;
+    font-size: .84rem;
+    padding: .45rem .58rem;
   }
 }
