@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 180" role="img" aria-label="Fairbairn Consult logo">
+  <rect width="520" height="180" rx="24" fill="#ffffff"/>
+  <circle cx="86" cy="90" r="44" fill="#6fb7b2"/>
+  <path d="M64 102c18-40 50-48 76-36-18 2-34 15-46 44-10-10-20-12-30-8Z" fill="#18333c"/>
+  <text x="154" y="82" font-family="Georgia, 'Times New Roman', serif" font-size="36" font-weight="700" fill="#2f2f31">Fairbairn</text>
+  <text x="154" y="122" font-family="Inter, Arial, sans-serif" font-size="28" font-weight="700" fill="#6b6259">Consult</text>
+  <text x="154" y="148" font-family="Inter, Arial, sans-serif" font-size="16" fill="#8a8074">FSP 9328</text>
+</svg>

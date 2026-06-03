@@ -1,47 +1,62 @@
 // Vercel Serverless Function: Save a call-back request from the voice agent
 // Called by the Grok Voice Agent when a visitor requests a call-back.
 
-// In-memory store for demo. Replace with email notification / database / Google Sheets in production.
-const callbacks = [];
+import {
+  applyRateLimit,
+  cleanText,
+  forwardLead,
+  isValidPhone,
+  methodNotAllowed,
+  noStore,
+  parseBody,
+  requestId,
+} from './_utils.js';
 
 export default async function handler(req, res) {
+  noStore(res);
+
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return methodNotAllowed(res);
   }
 
-  // Auth check — the voice agent calls this with a shared secret
-  const API_SECRET = process.env.BOOKING_API_SECRET || 'changeme-setup-env-var';
-  if (req.headers['x-booking-secret'] !== API_SECRET) {
-    return res.status(403).json({ error: 'Unauthorized' });
+  if (!applyRateLimit(req, res, { scope: 'callback-request', max: 5 })) {
+    return res.status(429).json({ error: 'Too many requests. Please try again later.' });
   }
 
-  const { name, phone, preferred_time, reason } = req.body;
-
-  if (!name || !phone) {
-    return res.status(400).json({ error: 'name and phone are required' });
-  }
-
+  const body = parseBody(req);
   const callback = {
-    id: `cb_${Date.now()}`,
-    name,
-    phone,
-    preferred_time: preferred_time || 'Any time',
-    reason: reason || 'Not specified',
+    id: requestId('cb'),
+    name: cleanText(body.name, 120),
+    phone: cleanText(body.phone, 60),
+    preferred_time: cleanText(body.preferred_time, 120) || 'Any time',
+    reason: cleanText(body.reason, 400) || 'Not specified',
+    source: 'voice-agent',
     status: 'pending',
     created_at: new Date().toISOString(),
   };
 
-  callbacks.push(callback);
+  if (!callback.name || !callback.phone) {
+    return res.status(400).json({ error: 'name and phone are required' });
+  }
 
-  // TODO: Send email notification to Erenst
-  // TODO: Save to Google Sheets / database
-  // TODO: Send SMS confirmation to visitor
+  if (!isValidPhone(callback.phone)) {
+    return res.status(400).json({ error: 'Please provide a valid contact number' });
+  }
 
-  console.log('New call-back request:', callback);
+  try {
+    const delivery = await forwardLead('callback.requested', callback);
+    console.info('New call-back request:', { ...callback, delivery });
 
-  return res.status(200).json({
-    success: true,
-    callback_id: callback.id,
-    message: `Thank you, ${name}. Erenst will call you back${preferred_time ? ' ' + preferred_time : ' soon'}. Have a good day!`,
-  });
+    return res.status(200).json({
+      success: true,
+      callback_id: callback.id,
+      message: `Thank you, ${callback.name}. Erenst will call you back ${callback.preferred_time}. Have a good day!`,
+    });
+  } catch (error) {
+    console.error('Callback request delivery failed:', error);
+    return res.status(502).json({
+      success: false,
+      error: 'The message could not be saved right now. Please use the contact details on the website.',
+    });
+  }
 }

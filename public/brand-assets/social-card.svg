@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="Erenst Meyer Financial Advisor social preview">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3a312b"/>
+      <stop offset="0.55" stop-color="#251f1b"/>
+      <stop offset="1" stop-color="#181411"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="82%" cy="18%" r="50%">
+      <stop offset="0" stop-color="#6fb7b2" stop-opacity="0.36"/>
+      <stop offset="1" stop-color="#6fb7b2" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+  <path d="M0 490c170-70 345-78 520-22 215 68 410 70 630-14 20-8 37-13 50-17v193H0Z" fill="#6fb7b2" opacity="0.17"/>
+  <circle cx="132" cy="130" r="58" fill="#6fb7b2"/>
+  <text x="132" y="146" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="38" font-weight="800" fill="#132126">EM</text>
+  <text x="98" y="280" font-family="Georgia, 'Times New Roman', serif" font-size="78" font-weight="700" fill="#f6f1e8">Erenst Meyer</text>
+  <text x="98" y="355" font-family="Georgia, 'Times New Roman', serif" font-size="54" fill="#f6f1e8">Financial Advisor</text>
+  <text x="100" y="425" font-family="Inter, Arial, sans-serif" font-size="28" fill="#d4c7b5">Personal financial advice with structured long-term support</text>
+  <rect x="98" y="488" width="450" height="10" rx="5" fill="#6fb7b2"/>
+  <rect x="548" y="488" width="150" height="10" fill="#f59a2a"/>
+  <rect x="698" y="488" width="150" height="10" fill="#d44a3a"/>
+  <rect x="848" y="488" width="150" height="10" fill="#8b2d6f"/>
+  <text x="100" y="550" font-family="Inter, Arial, sans-serif" font-size="22" fill="#d4c7b5">Representative under Fairbairn Consult (Pty) Ltd - FSP 9328</text>
+</svg>

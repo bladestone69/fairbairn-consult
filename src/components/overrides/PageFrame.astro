@@ -1,12 +1,103 @@
 ---
 import DefaultPageFrame from '@astrojs/starlight/components/PageFrame.astro';
 import VoiceAgentWidget from '../VoiceAgentWidget.astro';
-const { hasSidebar } = Astro.locals.starlightRoute;
+const currentPath = Astro.url.pathname;
+const navItems = [
+  { label: 'Home', href: '/' },
+  { label: 'About', href: '/about/' },
+  { label: 'Services', href: '/services/' },
+  { label: 'Advice', href: '/advice-process/' },
+  { label: 'Tools', href: '/planning-tools/' },
+  { label: 'Docs', href: '/documents/' },
+  { label: 'Contact', href: '/contact/' },
+];
+
+function isActive(href: string) {
+  return href === '/' ? currentPath === '/' : currentPath.startsWith(href);
+}
+
+const siteUrl = Astro.site ?? new URL(Astro.url.origin);
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': ['FinancialService', 'LocalBusiness'],
+  name: 'Erenst Meyer Financial Advisor',
+  description: 'Personal financial advice with structured long-term support.',
+  url: new URL('/', siteUrl).toString(),
+  image: new URL('/brand-assets/social-card.svg', siteUrl).toString(),
+  telephone: '+27107532383',
+  email: 'emeyer@fairbairnconsult.co.za',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: '41 Washington Drive, Northcliff Extension 25',
+    addressLocality: 'Randburg',
+    addressCountry: 'ZA',
+  },
+  areaServed: {
+    '@type': 'Country',
+    name: 'South Africa',
+  },
+  founder: {
+    '@type': 'Person',
+    name: 'Erenst Meyer',
+  },
+  parentOrganization: {
+    '@type': 'Organization',
+    name: 'Fairbairn Consult (Pty) Ltd',
+    identifier: 'FSP 9328',
+  },
+};
 ---
 
-<DefaultPageFrame hasSidebar={hasSidebar}>
-  <slot name="header" />
-  {hasSidebar && <slot name="sidebar" />}
+<nav class="public-nav" aria-label="Primary navigation">
+  <a class="public-nav__brand" href="/" aria-label="Erenst Meyer Financial Advisor home">
+    <span class="public-nav__mark">EM</span>
+    <span>
+      <strong>Erenst Meyer</strong>
+      <small>Financial Advisor</small>
+    </span>
+  </a>
+  <div class="public-nav__links">
+    {navItems.map((item) => (
+      <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>
+        {item.label}
+      </a>
+    ))}
+  </div>
+</nav>
+
+<DefaultPageFrame hasSidebar={false}>
   <slot />
 </DefaultPageFrame>
+<footer class="site-footer global-footer">
+  <div class="footer-grid">
+    <div>
+      <h3>Erenst Meyer Financial Advisor</h3>
+      <p>Personal financial advice with structured long-term support.</p>
+      <p class="meta"><strong>Representative under Fairbairn Consult (Pty) Ltd</strong><br />FSP Number: 9328</p>
+    </div>
+    <div>
+      <p><strong>Explore</strong></p>
+      <a href="/about/">About</a>
+      <a href="/services/">Services</a>
+      <a href="/advice-process/">Advice Process</a>
+      <a href="/planning-tools/">Planning Tools</a>
+    </div>
+    <div>
+      <p><strong>Trust & compliance</strong></p>
+      <a href="/documents/disclosures/">Disclosures</a>
+      <a href="/compliance/privacy/">Privacy</a>
+      <a href="/compliance/complaints/">Complaints Process</a>
+      <a href="/documents/regulatory/">Regulatory & Policies</a>
+    </div>
+    <div>
+      <p><strong>Contact</strong></p>
+      <a href="tel:+27832909399">+27 (0)83 290 9399</a>
+      <a href="tel:+27107532383">+27 (0)10 753 2383</a>
+      <a href="mailto:emeyer@fairbairnconsult.co.za">emeyer@fairbairnconsult.co.za</a>
+      <a href="/contact/">Start a conversation</a>
+    </div>
+  </div>
+  <p class="footer-note">Advice and supporting services are provided subject to the relevant disclosure, regulatory, and product documentation. This website provides general information only and does not constitute financial advice.</p>
+</footer>
 <VoiceAgentWidget />
+<script type="application/ld+json" set:html={JSON.stringify(structuredData)} />

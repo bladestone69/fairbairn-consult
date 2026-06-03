@@ -26,14 +26,19 @@ npm run dev
 npm run build
 ```
 
+## Environment variables
+- `XAI_API_KEY` - required for the Ara voice receptionist session endpoint.
+- `CONTACT_WEBHOOK_URL` - optional but recommended; receives callback and appointment request payloads from serverless functions.
+- `CONTACT_WEBHOOK_SECRET` - optional bearer token sent to `CONTACT_WEBHOOK_URL`.
+
 ## Deployment
 The project is linked to Vercel and the intended production URL is:
-- https://zabroker.vercel.app
+- https://www.financial-advisor.co.za
 
 ## Current known issues
 - Vercel production deployments have intermittently failed with a platform-side "Unexpected error" while the local build succeeds.
-- Contact details still need final real-world values before the public site is fully complete.
 - Some document sections still need final approved public files.
+- Voice-agent lead delivery should be connected to a production `CONTACT_WEBHOOK_URL` destination before relying on it as the primary contact channel.
 
 ## Key content areas
 - Home

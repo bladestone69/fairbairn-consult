@@ -96,7 +96,15 @@
   }
 
   function showBookingConfirmed(result) {
-    bookingArea.innerHTML = '<div class="voice-agent-booking"><strong>✓ Message Saved</strong><p>' + result.message + '</p></div>';
+    bookingArea.textContent = '';
+    const wrapper = document.createElement('div');
+    const heading = document.createElement('strong');
+    const message = document.createElement('p');
+    wrapper.className = 'voice-agent-booking';
+    heading.textContent = 'Message Saved';
+    message.textContent = result.message || 'Erenst will receive your message.';
+    wrapper.append(heading, message);
+    bookingArea.appendChild(wrapper);
   }
 
   // Accumulate transcript deltas

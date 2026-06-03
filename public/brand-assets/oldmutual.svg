@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 180" role="img" aria-label="Old Mutual logo">
+  <rect width="520" height="180" rx="24" fill="#ffffff"/>
+  <rect x="50" y="44" width="88" height="88" rx="20" fill="#0b6f43"/>
+  <circle cx="94" cy="88" r="27" fill="none" stroke="#ffffff" stroke-width="10"/>
+  <text x="168" y="84" font-family="Georgia, 'Times New Roman', serif" font-size="38" font-weight="700" fill="#0b6f43">Old Mutual</text>
+  <text x="170" y="122" font-family="Inter, Arial, sans-serif" font-size="22" fill="#5f6f66">Product provider context</text>
+</svg>

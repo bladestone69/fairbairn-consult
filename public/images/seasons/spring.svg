@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="Soft spring landscape">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d9efe7"/>
+      <stop offset="0.55" stop-color="#b7d8ca"/>
+      <stop offset="1" stop-color="#f0d8a8"/>
+    </linearGradient>
+    <radialGradient id="sun" cx="24%" cy="24%" r="42%">
+      <stop offset="0" stop-color="#fff7d6" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="#fff7d6" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#sky)"/>
+  <rect width="1600" height="900" fill="url(#sun)"/>
+  <path d="M0 610c210-88 365-90 560-24 185 62 338 74 520 10 210-74 374-60 520 12v292H0Z" fill="#6fb7b2" opacity="0.56"/>
+  <path d="M0 690c250-76 450-66 640-16 210 56 385 48 588-18 140-45 250-42 372 4v240H0Z" fill="#2f4c43" opacity="0.78"/>
+  <g fill="#f6f1e8" opacity="0.42">
+    <circle cx="220" cy="530" r="8"/>
+    <circle cx="340" cy="575" r="5"/>
+    <circle cx="1180" cy="585" r="7"/>
+    <circle cx="1315" cy="545" r="5"/>
+  </g>
+</svg>

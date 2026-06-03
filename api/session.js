@@ -1,15 +1,23 @@
 // Vercel Serverless Function: Create ephemeral token for xAI Voice Agent
 // This keeps the API key server-side and gives the browser a short-lived token.
 
+import { applyRateLimit, methodNotAllowed, noStore } from './_utils.js';
+
 export default async function handler(req, res) {
+  noStore(res);
+
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return methodNotAllowed(res);
+  }
+
+  if (!applyRateLimit(req, res, { scope: 'voice-session', max: 10 })) {
+    return res.status(429).json({ error: 'Too many voice session requests. Please try again later.' });
   }
 
   const XAI_API_KEY = process.env.XAI_API_KEY;
   if (!XAI_API_KEY) {
     console.error('XAI_API_KEY not set in environment');
-    return res.status(500).json({ error: 'XAI_API_KEY not configured on server' });
+    return res.status(500).json({ error: 'Voice assistant is not configured on server' });
   }
 
   try {
@@ -27,7 +35,7 @@ export default async function handler(req, res) {
     if (!response.ok) {
       const errText = await response.text();
       console.error('xAI ephemeral token error:', response.status, errText);
-      return res.status(response.status).json({ error: 'Failed to create session', details: errText });
+      return res.status(response.status).json({ error: 'Failed to create voice session' });
     }
 
     const data = await response.json();

@@ -1,50 +1,70 @@
 // Vercel Serverless Function: Book an appointment
 // Called by the Grok Voice Agent as a custom function tool.
 
-// In-memory store for demo. Replace with Google Calendar / Calendly / database in production.
-const appointments = [];
+import {
+  applyRateLimit,
+  cleanText,
+  forwardLead,
+  isValidEmail,
+  isValidPhone,
+  methodNotAllowed,
+  noStore,
+  parseBody,
+  requestId,
+} from './_utils.js';
 
 export default async function handler(req, res) {
+  noStore(res);
+
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return methodNotAllowed(res);
   }
 
-  // Simple auth check — the voice agent calls this with a shared secret
-  const API_SECRET = process.env.BOOKING_API_SECRET || 'changeme-setup-env-var';
-  if (req.headers['x-booking-secret'] !== API_SECRET) {
-    return res.status(403).json({ error: 'Unauthorized' });
+  if (!applyRateLimit(req, res, { scope: 'appointment-request', max: 5 })) {
+    return res.status(429).json({ error: 'Too many requests. Please try again later.' });
   }
 
-  const { name, phone, email, date, time, service, notes } = req.body;
-
-  if (!name || !date || !time) {
-    return res.status(400).json({ error: 'name, date, and time are required' });
-  }
-
+  const body = parseBody(req);
   const appointment = {
-    id: `apt_${Date.now()}`,
-    name,
-    phone: phone || 'not provided',
-    email: email || 'not provided',
-    date,
-    time,
-    service: service || 'General financial advice consultation',
-    notes: notes || '',
-    status: 'confirmed',
+    id: requestId('apt'),
+    name: cleanText(body.name, 120),
+    phone: cleanText(body.phone, 60),
+    email: cleanText(body.email, 160),
+    date: cleanText(body.date, 40),
+    time: cleanText(body.time, 40),
+    service: cleanText(body.service, 160) || 'General financial advice consultation',
+    notes: cleanText(body.notes, 500),
+    source: 'website',
+    status: 'requested',
     created_at: new Date().toISOString(),
   };
 
-  appointments.push(appointment);
+  if (!appointment.name || !appointment.date || !appointment.time) {
+    return res.status(400).json({ error: 'name, date, and time are required' });
+  }
 
-  // TODO: Send confirmation email/SMS
-  // TODO: Add to Google Calendar
-  // TODO: Save to database
+  if (appointment.phone && !isValidPhone(appointment.phone)) {
+    return res.status(400).json({ error: 'Please provide a valid contact number' });
+  }
 
-  console.log('New appointment booked:', appointment);
+  if (!isValidEmail(appointment.email)) {
+    return res.status(400).json({ error: 'Please provide a valid email address' });
+  }
 
-  return res.status(200).json({
-    success: true,
-    appointment_id: appointment.id,
-    message: `Appointment confirmed for ${name} on ${date} at ${time}. Reference: ${appointment.id}`,
-  });
+  try {
+    const delivery = await forwardLead('appointment.requested', appointment);
+    console.info('New appointment request:', { ...appointment, delivery });
+
+    return res.status(200).json({
+      success: true,
+      appointment_id: appointment.id,
+      message: `Appointment request received for ${appointment.name} on ${appointment.date} at ${appointment.time}. Reference: ${appointment.id}`,
+    });
+  } catch (error) {
+    console.error('Appointment request delivery failed:', error);
+    return res.status(502).json({
+      success: false,
+      error: 'The appointment request could not be saved right now. Please use the contact details on the website.',
+    });
+  }
 }

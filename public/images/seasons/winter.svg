@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="Quiet winter landscape">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d6e5eb"/>
+      <stop offset="0.55" stop-color="#8ba9b2"/>
+      <stop offset="1" stop-color="#263239"/>
+    </linearGradient>
+    <radialGradient id="moon" cx="78%" cy="20%" r="30%">
+      <stop offset="0" stop-color="#f6f1e8" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#f6f1e8" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#sky)"/>
+  <rect width="1600" height="900" fill="url(#moon)"/>
+  <path d="M0 590c250-92 450-80 640-8 190 72 370 88 574 10 154-58 272-62 386-28v336H0Z" fill="#e8efe9" opacity="0.48"/>
+  <path d="M0 705c220-74 410-70 610-14 226 64 430 46 650-32 132-47 246-44 340-8v249H0Z" fill="#233036" opacity="0.84"/>
+  <g fill="#f6f1e8" opacity="0.58">
+    <circle cx="310" cy="190" r="3"/>
+    <circle cx="515" cy="275" r="2"/>
+    <circle cx="980" cy="210" r="3"/>
+    <circle cx="1260" cy="300" r="2"/>
+  </g>
+</svg>
