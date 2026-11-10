@@ -1,0 +1,36 @@
+<section class="callback-form-section" aria-labelledby="callback-heading">
+  <h2 id="callback-heading">Request a call back</h2>
+  <p>Leave your details and I’ll get in touch. Please don’t include financial account numbers or other sensitive information.</p>
+  <form id="callback-form">
+    <label for="callback-name">Your name <span aria-hidden="true">*</span></label><input id="callback-name" name="name" autocomplete="name" maxlength="120" required />
+    <label for="callback-phone">Phone number <span aria-hidden="true">*</span></label><input id="callback-phone" name="phone" type="tel" autocomplete="tel" maxlength="60" required />
+    <label for="callback-email">Email address <span>(optional)</span></label><input id="callback-email" name="email" type="email" autocomplete="email" maxlength="160" />
+    <label for="callback-time">Best time to call <span>(optional)</span></label><input id="callback-time" name="preferred_time" maxlength="120" placeholder="For example, weekday mornings" />
+    <label for="callback-reason">What would you like to discuss? <span>(optional)</span></label><textarea id="callback-reason" name="reason" rows="3" maxlength="400"></textarea>
+    <div class="callback-trap" aria-hidden="true"><label for="callback-website">Website</label><input id="callback-website" name="website" tabindex="-1" autocomplete="off" /></div>
+    <p class="callback-privacy">By submitting this form, you ask Erenst to contact you about your enquiry. Read the <a href="/compliance/privacy/">privacy information</a>.</p>
+    <button type="submit">Request a call back</button><p id="callback-status" role="status" aria-live="polite"></p>
+  </form>
+</section>
+<script>
+  const form = document.querySelector('#callback-form');
+  const status = document.querySelector('#callback-status');
+  if (form instanceof HTMLFormElement && status instanceof HTMLElement) {
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+      const button = form.querySelector('button');
+      if (button) button.disabled = true;
+      status.textContent = 'Sending your request…';
+      try {
+        const response = await fetch('/api/callback-request', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.fromEntries(new FormData(form))) });
+        const result = await response.json();
+        if (!response.ok || !result.success) throw new Error(result.error || 'Unable to send your request. Please call or email Erenst directly.');
+        form.reset();
+        status.textContent = 'Thank you. Your callback request has been sent.';
+      } catch (error) {
+        status.textContent = error instanceof Error ? error.message : 'Unable to send your request. Please call or email Erenst directly.';
+      } finally { if (button) button.disabled = false; }
+    });
+  }
+</script>
