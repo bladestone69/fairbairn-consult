@@ -1,62 +1,27 @@
-// Vercel Serverless Function: Save a call-back request from the voice agent
-// Called by the Grok Voice Agent when a visitor requests a call-back.
-
-import {
-  applyRateLimit,
-  cleanText,
-  forwardLead,
-  isValidPhone,
-  methodNotAllowed,
-  noStore,
-  parseBody,
-  requestId,
-} from './_utils.js';
+import nodemailer from 'nodemailer';
+import { applyRateLimit, cleanText, isValidPhone, isValidEmail, methodNotAllowed, noStore, parseBody, requestId } from './_utils.js';
 
 export default async function handler(req, res) {
   noStore(res);
-
-  if (req.method !== 'POST') {
-    return methodNotAllowed(res);
-  }
-
-  if (!applyRateLimit(req, res, { scope: 'callback-request', max: 5 })) {
-    return res.status(429).json({ error: 'Too many requests. Please try again later.' });
-  }
-
+  if (req.method !== 'POST') return methodNotAllowed(res);
+  if (!applyRateLimit(req, res, { scope: 'callback-request', max: 5 })) return res.status(429).json({ error: 'Too many requests. Please try again later.' });
   const body = parseBody(req);
-  const callback = {
-    id: requestId('cb'),
-    name: cleanText(body.name, 120),
-    phone: cleanText(body.phone, 60),
-    preferred_time: cleanText(body.preferred_time, 120) || 'Any time',
-    reason: cleanText(body.reason, 400) || 'Not specified',
-    source: 'voice-agent',
-    status: 'pending',
-    created_at: new Date().toISOString(),
-  };
-
-  if (!callback.name || !callback.phone) {
-    return res.status(400).json({ error: 'name and phone are required' });
-  }
-
-  if (!isValidPhone(callback.phone)) {
-    return res.status(400).json({ error: 'Please provide a valid contact number' });
-  }
-
+  if (body.website) return res.status(400).json({ error: 'Unable to submit your request.' });
+  const name = cleanText(body.name, 120);
+  const phone = cleanText(body.phone, 60);
+  const email = cleanText(body.email, 160);
+  const preferredTime = cleanText(body.preferred_time, 120) || 'Any time';
+  const reason = cleanText(body.reason, 400);
+  if (!name || !phone || !isValidPhone(phone) || !isValidEmail(email)) return res.status(400).json({ error: 'Please provide your name, a valid phone number and, if supplied, a valid email address.' });
+  const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, CALLBACK_RECIPIENT } = process.env;
+  if (!SMTP_HOST || !SMTP_PORT || !SMTP_USER || !SMTP_PASS || !CALLBACK_RECIPIENT) return res.status(503).json({ error: 'Unable to send your request right now. Please call or email Erenst directly.' });
+  const id = requestId('cb');
   try {
-    const delivery = await forwardLead('callback.requested', callback);
-    console.info('New call-back request:', { ...callback, delivery });
-
-    return res.status(200).json({
-      success: true,
-      callback_id: callback.id,
-      message: `Thank you, ${callback.name}. Erenst will call you back ${callback.preferred_time}. Have a good day!`,
-    });
+    const transport = nodemailer.createTransport({ host: SMTP_HOST, port: Number(SMTP_PORT), secure: Number(SMTP_PORT) === 465, requireTLS: true, auth: { user: SMTP_USER, pass: SMTP_PASS }, connectionTimeout: 10000, greetingTimeout: 10000, socketTimeout: 15000 });
+    await transport.sendMail({ from: `Financial Advisor Website <${SMTP_USER}>`, to: CALLBACK_RECIPIENT, subject: 'New website callback request', text: `A visitor has requested a call.\n\nName: ${name}\nPhone: ${phone}\nEmail: ${email || 'Not supplied'}\nPreferred time: ${preferredTime}\nMessage: ${reason || 'Not supplied'}\nReference: ${id}`, ...(email ? { replyTo: email } : {}) });
+    return res.status(200).json({ success: true, callback_id: id, message: 'Thank you. Your callback request has been sent.' });
   } catch (error) {
-    console.error('Callback request delivery failed:', error);
-    return res.status(502).json({
-      success: false,
-      error: 'The message could not be saved right now. Please use the contact details on the website.',
-    });
+    console.error('Callback email delivery failed:', error.code || 'unknown error');
+    return res.status(502).json({ error: 'Unable to send your request right now. Please call or email Erenst directly.' });
   }
 }
