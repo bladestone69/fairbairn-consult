@@ -36,12 +36,13 @@ export default defineConfig({
           tag: 'meta',
           attrs: {
             name: 'theme-color',
-            content: '#251f1b',
+            content: '#123e37',
           },
         },
       ],
       customCss: ['./src/styles/custom.css'],
       components: {
+        Hero: './src/components/AdvisorHero.astro',
         PageFrame: './src/components/overrides/PageFrame.astro',
       },
       sidebar: [

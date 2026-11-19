@@ -1,179 +1,38 @@
 ---
-// VoiceAgentWidget.astro — Injects the voice agent widget into every page
+import { araAgentId as agentId } from '../ara';
 ---
+<section id="ara" aria-labelledby="ara-heading" class="receptionist" data-agent-id={agentId}>
+  <h2 id="ara-heading">Ara, AI receptionist</h2>
+  {agentId ? (
+    <>
+      <p>Ara can take down a callback request. You can check every detail before sending it to Erenst.</p>
+      <p class="voice-note">ElevenLabs processes what you say or type. Please keep account numbers and financial documents private.</p>
+      <button id="ara-call" type="button" hidden>Start voice call</button>
+      <button id="ara-chat" type="button" hidden>Type to Ara</button>
+      <p id="ara-status" role="status"></p>
+      <div id="ara-messages" role="log" aria-label="Conversation with Ara" hidden></div>
+      <form id="ara-compose" hidden>
+        <label for="ara-input">Your message</label>
+        <input id="ara-input" name="message" maxlength="400" autocomplete="off" required />
+        <button type="submit">Send message</button>
+      </form>
+      <noscript><p>Enable JavaScript for voice calls or phone Erenst directly.</p></noscript>
+    </>
+  ) : <p>Ara is currently unavailable. You can still reach Erenst directly.</p>}
+  <a href="#callback-heading">Use the callback form</a>
+</section>
 
-<link rel="stylesheet" href="/voice-agent/voice-agent.css" />
-
-<div class="voice-agent-widget" id="voiceAgentWidget">
-  <button class="voice-agent-btn" id="voiceAgentBtn" aria-label="Talk to Ara, our AI receptionist" title="Talk to Ara">
-    🎙️
-  </button>
-
-  <div class="voice-agent-panel" id="voiceAgentPanel">
-    <div class="voice-agent-header">
-      <div class="voice-agent-avatar">A</div>
-      <div class="voice-agent-header-info">
-        <h3>Ara</h3>
-        <span id="voiceAgentStatus">AI Receptionist · Erenst Meyer</span>
-      </div>
-      <button class="voice-agent-close" id="voiceAgentClose" aria-label="Close">&times;</button>
-    </div>
-
-    <div class="voice-agent-transcript" id="voiceAgentTranscript">
-      <div class="voice-agent-msg system">Tap the mic to talk to Ara. She'll take your details and Erenst will call you back.</div>
-    </div>
-
-    <div id="voiceAgentBookingArea"></div>
-
-    <div class="voice-agent-status">
-      <span class="voice-agent-status-dot" id="voiceAgentDot"></span>
-      <span id="voiceAgentStatusText">Ready</span>
-    </div>
-  </div>
-</div>
-
-<script is:inline src="/voice-agent/voice-booking-agent.js"></script>
-<script is:inline>
-(function() {
-  const btn = document.getElementById('voiceAgentBtn');
-  const panel = document.getElementById('voiceAgentPanel');
-  const closeBtn = document.getElementById('voiceAgentClose');
-  const transcript = document.getElementById('voiceAgentTranscript');
-  const dot = document.getElementById('voiceAgentDot');
-  const statusText = document.getElementById('voiceAgentStatusText');
-  const bookingArea = document.getElementById('voiceAgentBookingArea');
-
-  let agent = null;
-  let panelOpen = false;
-
-  function togglePanel() {
-    panelOpen = !panelOpen;
-    panel.classList.toggle('open', panelOpen);
+<script>
+  import { attachReceptionist } from '../scripts/receptionist';
+  const panel = document.querySelector<HTMLElement>('#ara');
+  const form = document.querySelector<HTMLFormElement>('#callback-form');
+  if (panel?.dataset.agentId && form) {
+    // Load audio support only on the contact page of a configured site.
+    import('@elevenlabs/client').then(({ Conversation }) => {
+      attachReceptionist(panel, form, Conversation.startSession);
+    }).catch(() => {
+      const status = panel.querySelector('#ara-status');
+      if (status) status.textContent = 'Voice could not load. You can still use the callback form.';
+    });
   }
-
-  function addMessage(role, text) {
-    const div = document.createElement('div');
-    div.className = 'voice-agent-msg ' + role;
-    div.textContent = text;
-    transcript.appendChild(div);
-    transcript.scrollTop = transcript.scrollHeight;
-  }
-
-  function updateStatus(state) {
-    btn.className = 'voice-agent-btn';
-    dot.className = 'voice-agent-status-dot';
-
-    switch (state) {
-      case 'connecting':
-        btn.classList.add('connecting');
-        dot.classList.add('connecting');
-        statusText.textContent = 'Connecting to Ara...';
-        break;
-      case 'listening':
-        btn.classList.add('listening');
-        dot.classList.add('active');
-        statusText.textContent = 'Listening — speak now';
-        break;
-      case 'user_speaking':
-        btn.classList.add('listening');
-        dot.classList.add('active');
-        statusText.textContent = 'Listening — speak now';
-        break;
-      case 'processing':
-        dot.classList.add('active');
-        statusText.textContent = 'Ara is speaking...';
-        break;
-      case 'error':
-        dot.classList.add('error');
-        statusText.textContent = 'Something went wrong. Try again.';
-        break;
-      case 'disconnected':
-        statusText.textContent = 'Disconnected';
-        break;
-      default:
-        statusText.textContent = 'Ready';
-    }
-  }
-
-  function showBookingConfirmed(result) {
-    bookingArea.textContent = '';
-    const wrapper = document.createElement('div');
-    const heading = document.createElement('strong');
-    const message = document.createElement('p');
-    wrapper.className = 'voice-agent-booking';
-    heading.textContent = 'Message Saved';
-    message.textContent = result.message || 'Erenst will receive your message.';
-    wrapper.append(heading, message);
-    bookingArea.appendChild(wrapper);
-  }
-
-  // Accumulate transcript deltas
-  let currentAssistantText = '';
-
-  async function startAgent() {
-    if (agent) {
-      agent.stop();
-      agent = null;
-      updateStatus('disconnected');
-      btn.textContent = '🎙️';
-      return;
-    }
-
-    try {
-      agent = new VoiceBookingAgent({
-        apiBase: '',
-        onStateChange: updateStatus,
-        onTranscript: function(msg) {
-          if (msg.role === 'user' && msg.done && msg.text) {
-            addMessage('user', msg.text);
-          } else if (msg.role === 'assistant') {
-            if (!msg.done) {
-              // Delta — accumulate
-              currentAssistantText += msg.text;
-            } else {
-              // Done — show full message
-              if (msg.text) {
-                currentAssistantText = msg.text;
-              }
-              if (currentAssistantText) {
-                addMessage('assistant', currentAssistantText);
-                currentAssistantText = '';
-              }
-            }
-          }
-        },
-        onError: function(err) {
-          addMessage('system', 'Error: ' + err);
-        },
-        onBookingConfirmed: showBookingConfirmed
-      });
-
-      await agent.start();
-      btn.textContent = '⏹';
-      addMessage('system', 'Ara is connected. You can speak now.');
-    } catch (err) {
-      addMessage('system', 'Could not connect: ' + err.message);
-      updateStatus('error');
-      agent = null;
-      btn.textContent = '🎙️';
-    }
-  }
-
-  btn.addEventListener('click', function() {
-    if (!panelOpen) {
-      togglePanel();
-    }
-    startAgent();
-  });
-
-  closeBtn.addEventListener('click', function() {
-    if (agent) {
-      agent.stop();
-      agent = null;
-      btn.textContent = '🎙️';
-      updateStatus('disconnected');
-    }
-    togglePanel();
-  });
-})();
 </script>

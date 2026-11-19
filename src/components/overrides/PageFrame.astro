@@ -1,15 +1,14 @@
 ---
 import DefaultPageFrame from '@astrojs/starlight/components/PageFrame.astro';
-import VoiceAgentWidget from '../VoiceAgentWidget.astro';
+import { araAgentId } from '../../ara';
+const hasVoice = Boolean(araAgentId);
 const currentPath = Astro.url.pathname;
 const navItems = [
-  { label: 'Home', href: '/' },
   { label: 'About', href: '/about/' },
   { label: 'Services', href: '/services/' },
-  { label: 'Advice', href: '/advice-process/' },
-  { label: 'Tools', href: '/planning-tools/' },
-  { label: 'Docs', href: '/documents/' },
-  { label: 'Contact', href: '/contact/' },
+  { label: 'Advice process', href: '/advice-process/' },
+  { label: 'Planning tools', href: '/planning-tools/' },
+  { label: 'Documents', href: '/documents/' },
 ];
 
 function isActive(href: string) {
@@ -56,13 +55,16 @@ const structuredData = {
       <small>Financial Advisor</small>
     </span>
   </a>
-  <div class="public-nav__links">
+  <button class="nav-toggle" type="button" aria-controls="primary-links" aria-expanded="false" hidden>Menu</button>
+  <div class="public-nav__links" id="primary-links">
     {navItems.map((item) => (
       <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>
         {item.label}
       </a>
     ))}
+    {hasVoice && <a href="/contact/#ara">Talk to Ara</a>}
   </div>
+  <a class="nav-callback" href="/contact/#callback-heading">Request a call back</a>
 </nav>
 
 <DefaultPageFrame hasSidebar={false}>
@@ -94,10 +96,25 @@ const structuredData = {
       <a href="tel:+27832909399">+27 (0)83 290 9399</a>
       <a href="tel:+27107532383">+27 (0)10 753 2383</a>
       <a href="mailto:emeyer@fairbairnconsult.co.za">emeyer@fairbairnconsult.co.za</a>
-      <a href="/contact/">Start a conversation</a>
+      <a href="/contact/#callback-heading">Request a call back</a>
+      {hasVoice && <a href="/contact/#ara">Talk to Ara</a>}
     </div>
   </div>
   <p class="footer-note">Advice and supporting services are provided subject to the relevant disclosure, regulatory, and product documentation. This website provides general information only and does not constitute financial advice.</p>
 </footer>
-<VoiceAgentWidget />
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>('.nav-toggle');
+  if (toggle) {
+    toggle.hidden = false;
+    toggle.addEventListener('click', () => {
+      toggle.setAttribute('aria-expanded', String(toggle.getAttribute('aria-expanded') !== 'true'));
+    });
+    toggle.closest('nav')?.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.focus();
+      }
+    });
+  }
+</script>
 <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />

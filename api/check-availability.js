@@ -1,5 +1,4 @@
 // Vercel Serverless Function: Check available time slots
-// Called by the Grok Voice Agent as a custom function tool.
 
 import { applyRateLimit, cleanText, methodNotAllowed, noStore, parseBody } from './_utils.js';
 

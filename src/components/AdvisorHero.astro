@@ -1,38 +1,55 @@
-<section class="hero hero-premium hero-upgraded seasonal-hero">
-  <div class="seasonal-backdrop" aria-hidden="true">
-    <div class="season-frame season-spring"></div>
-    <div class="season-frame season-summer"></div>
-    <div class="season-frame season-autumn"></div>
-    <div class="season-frame season-winter"></div>
-  </div>
-  <div class="hero-copy">
-    <p class="eyebrow">Personal Financial Advice</p>
-    <p><strong>Erenst Meyer Financial Advisor</strong></p>
-    <h1>Clear advice, practical structure, and a real person to guide the big money decisions.</h1>
-    <p class="hero-intro">For people nearing retirement, already drawing income, or wanting a long-term advisor who explains things properly and stays involved.</p>
-    <div class="cta-row">
-      <a class="primary" href="/contact/">Book a first conversation</a>
-      <a class="secondary" href="/services/">Explore services</a>
-    </div>
-    <div class="hero-motion-cues" aria-hidden="true">
-      <span class="motion-pill">Retirement planning</span>
-      <span class="motion-pill">Investment advice</span>
-      <span class="motion-pill">Annual reviews</span>
+---
+import { araAgentId } from '../ara';
+---
+<section class="adviser-hero" aria-labelledby="_top">
+  <div class="adviser-hero__copy">
+    <p class="adviser-hero__eyebrow">Personal financial advice in South Africa</p>
+    <h1 id="_top">A plan for life <em>after work.</em></h1>
+    <p class="adviser-hero__intro">I’m Erenst Meyer. I help people prepare for retirement, make sense of their investments and plan the income they’ll live on.</p>
+    <div class="adviser-hero__actions">
+      <a class="adviser-hero__button" href="/contact/#callback-heading">Request a call back</a>
+      {araAgentId
+        ? <a class="adviser-hero__link" href="/contact/#ara">Talk to Ara</a>
+        : <a class="adviser-hero__link" href="#services">Explore services</a>}
     </div>
   </div>
-  <div class="hero-side-panel">
-    <div class="advisor-photo-card">
-      <img class="advisor-photo" src="/brand-assets/advisor-portrait.svg" alt="Portrait illustration for Erenst Meyer" width="96" height="96" />
-      <div>
-        <p class="doc-kicker">Advisor profile</p>
-        <h3>Erenst Meyer</h3>
-        <p class="meta">Representative under Fairbairn Consult (Pty) Ltd, FSP 9328. Personal advice, review-led planning, and structured long-term support.</p>
-      </div>
-    </div>
-    <div class="hero-proof">
-      <div class="proof-card"><strong>Personal Advice</strong><span>Direct, relationship-led guidance</span></div>
-      <div class="proof-card"><strong>Structured Process</strong><span>Documented, calm, and consistent</span></div>
-      <div class="proof-card"><strong>Annual Reviews</strong><span>Long-term support where relevant</span></div>
-    </div>
-  </div>
+  <figure class="adviser-hero__portrait">
+    <img src="/brand-assets/erenst-meyer.webp" width="848" height="1262" fetchpriority="high" alt="Erenst Meyer" />
+    <figcaption><strong>Erenst Meyer</strong><span>Financial adviser since 2005</span></figcaption>
+  </figure>
 </section>
+
+<style>
+  .adviser-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    background: #123e37;
+    border-radius: 1rem;
+    overflow: hidden;
+    color: #fffaf0;
+  }
+  .adviser-hero__copy { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding: clamp(2rem, 4vw, 4rem); }
+  .adviser-hero .adviser-hero__eyebrow { margin: 0 0 1.6rem; color: #c8ded0; font-size: .93rem; font-weight: 600; }
+  .adviser-hero h1 { margin: 0; font-size: clamp(3.55rem, 5.3vw, 4.9rem); font-weight: 400; line-height: 1; letter-spacing: -.055em; color: #fffaf0; }
+  .adviser-hero h1 em { display: block; color: #d6e5bf; }
+  .adviser-hero .adviser-hero__intro { margin: 1.5rem 0 0; max-width: 34ch; color: #e3ede6; font-size: 1.1rem; line-height: 1.6; }
+  .adviser-hero__actions { display: flex; align-items: center; flex-wrap: wrap; gap: 1rem 1.5rem; margin-top: 2rem; }
+  .adviser-hero__actions a { margin: 0; font-size: 1rem; font-weight: 650; }
+  .adviser-hero__actions .adviser-hero__button { background: #f6ecd5; color: #173930; padding: .75rem 1.2rem; border-radius: .4rem; text-decoration: none; }
+  .adviser-hero__button:hover { background: #fff8e9; }
+  .adviser-hero__actions .adviser-hero__link { color: #fffaf0; text-underline-offset: .3em; }
+  .adviser-hero__portrait { position: relative; isolation: isolate; margin: 0; min-height: 30rem; }
+  .adviser-hero__portrait img { position: absolute; inset: 0; height: 100%; width: 100%; object-fit: cover; object-position: center 28%; margin: 0; }
+  .adviser-hero__portrait figcaption { position: absolute; inset: auto 0 0; background: linear-gradient(transparent, rgb(10 30 26 / 87%)); padding: 4rem 1.75rem 1.5rem; }
+  .adviser-hero__portrait strong, .adviser-hero__portrait span { display: block; color: #fff; }
+  .adviser-hero__portrait strong { font: 1.6rem Georgia, serif; }
+  .adviser-hero__portrait span { font-size: .92rem; margin-top: .25rem; }
+  @media (max-width: 42rem) {
+    .adviser-hero { grid-template-columns: 1fr; }
+    .adviser-hero__copy { padding: 2rem 1.4rem; }
+    .adviser-hero h1 { font-size: clamp(3rem, 12vw, 4.5rem); }
+    .adviser-hero__portrait { min-height: 0; aspect-ratio: 1.55; }
+    .adviser-hero__portrait img { object-position: center 25%; }
+    .adviser-hero__portrait figcaption { padding: 2rem 1.4rem .85rem; }
+  }
+</style>
