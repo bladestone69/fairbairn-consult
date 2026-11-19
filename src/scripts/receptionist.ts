@@ -89,7 +89,7 @@ export function attachReceptionist(panel: HTMLElement, form: HTMLFormElement, st
       const connected = await startSession({
         agentId,
         textOnly,
-        connectionType: textOnly ? 'websocket' : 'webrtc',
+        connectionType: 'websocket',
         clientTools: {
           prepare_callback: (details) => current === attempt ? prepareCallback(details) : 'Conversation ended.'
         },
