@@ -1,5 +1,4 @@
 // Vercel Serverless Function: Book an appointment
-// Called by the Grok Voice Agent as a custom function tool.
 
 import {
   applyRateLimit,
