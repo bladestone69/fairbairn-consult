@@ -3,6 +3,7 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "redirects": [
-    { "source": "/voice-agent/widget.html", "destination": "/contact/#ara", "permanent": true }
+    { "source": "/voice-agent/widget.html", "destination": "/contact/#ara", "permanent": true },
+    { "source": "/docs/fairbairn-broker-branding-reference.pdf", "destination": "/about/#credentials-and-licensing", "permanent": true }
   ]
 }
