@@ -50,6 +50,7 @@ export default defineConfig({
           label: 'About',
           items: [
             { label: 'About Erenst Meyer', slug: 'about' },
+            { label: 'About Ruan Smith', slug: 'about/ruan-smith' },
           ],
         },
         {
