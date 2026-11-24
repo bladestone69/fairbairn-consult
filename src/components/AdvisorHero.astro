@@ -5,7 +5,7 @@ import { araAgentId } from '../ara';
   <div class="adviser-hero__copy">
     <p class="adviser-hero__eyebrow">Personal financial advice in South Africa</p>
     <h1 id="_top">A plan for life <em>after work.</em></h1>
-    <p class="adviser-hero__intro">I’m Erenst Meyer. I help people prepare for retirement, make sense of their investments and plan the income they’ll live on.</p>
+    <p class="adviser-hero__intro">How much will you need in retirement, and how can your investments get you there? We can help you work through both questions.</p>
     <div class="adviser-hero__actions">
       <a class="adviser-hero__button" href="/contact/#callback-heading">Request a call back</a>
       {araAgentId
@@ -13,22 +13,28 @@ import { araAgentId } from '../ara';
         : <a class="adviser-hero__link" href="#services">Explore services</a>}
     </div>
   </div>
-  <figure class="adviser-hero__portrait">
-    <img src="/brand-assets/erenst-meyer.webp" width="848" height="1262" fetchpriority="high" alt="Erenst Meyer" />
-    <figcaption><strong>Erenst Meyer</strong><span>Financial adviser since 2005</span></figcaption>
-  </figure>
+  <div class="adviser-hero__portraits">
+    <figure>
+      <div class="adviser-hero__photo"><img class="erenst-portrait" src="/brand-assets/erenst-meyer.webp" width="848" height="1262" fetchpriority="high" alt="Erenst Meyer" /></div>
+      <figcaption><strong>Erenst Meyer</strong><span>Retirement planning</span></figcaption>
+    </figure>
+    <figure>
+      <div class="adviser-hero__photo"><img src="/brand-assets/ruan-smith.webp" width="565" height="752" alt="Ruan Smith" /></div>
+      <figcaption><strong>Ruan Smith</strong><span>Investment planning</span></figcaption>
+    </figure>
+  </div>
 </section>
 
 <style>
   .adviser-hero {
     display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr);
     background: #123e37;
     border-radius: 1rem;
     overflow: hidden;
     color: #fffaf0;
   }
-  .adviser-hero__copy { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding: clamp(2rem, 4vw, 4rem); }
+  .adviser-hero__copy { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding: clamp(1.6rem, 3.5vw, 3.25rem); }
   .adviser-hero .adviser-hero__eyebrow { margin: 0 0 1.6rem; color: #c8ded0; font-size: .93rem; font-weight: 600; }
   .adviser-hero h1 { margin: 0; font-size: clamp(3.55rem, 5.3vw, 4.9rem); font-weight: 400; line-height: 1; letter-spacing: -.055em; color: #fffaf0; }
   .adviser-hero h1 em { display: block; color: #d6e5bf; }
@@ -38,18 +44,23 @@ import { araAgentId } from '../ara';
   .adviser-hero__actions .adviser-hero__button { background: #f6ecd5; color: #173930; padding: .75rem 1.2rem; border-radius: .4rem; text-decoration: none; }
   .adviser-hero__button:hover { background: #fff8e9; }
   .adviser-hero__actions .adviser-hero__link { color: #fffaf0; text-underline-offset: .3em; }
-  .adviser-hero__portrait { position: relative; isolation: isolate; margin: 0; min-height: 30rem; }
-  .adviser-hero__portrait img { position: absolute; inset: 0; height: 100%; width: 100%; object-fit: cover; object-position: center 28%; margin: 0; }
-  .adviser-hero__portrait figcaption { position: absolute; inset: auto 0 0; background: linear-gradient(transparent, rgb(10 30 26 / 87%)); padding: 4rem 1.75rem 1.5rem; }
-  .adviser-hero__portrait strong, .adviser-hero__portrait span { display: block; color: #fff; }
-  .adviser-hero__portrait strong { font: 1.6rem Georgia, serif; }
-  .adviser-hero__portrait span { font-size: .92rem; margin-top: .25rem; }
-  @media (max-width: 42rem) {
+  .adviser-hero__portraits { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(.65rem, 1.25vw, 1rem); align-content: center; padding: 1.5rem 1.5rem 1.5rem 0; }
+  .adviser-hero__portraits figure { margin: 0; min-width: 0; }
+  .adviser-hero__photo { aspect-ratio: 4 / 4.7; overflow: hidden; border-radius: .35rem; }
+  .adviser-hero__photo img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center top; margin: 0; }
+  .adviser-hero__photo .erenst-portrait { object-position: center 24%; transform: scale(1.42); transform-origin: 48% 28%; }
+  .adviser-hero__portraits figcaption { margin-top: .75rem; }
+  .adviser-hero__portraits strong, .adviser-hero__portraits span { display: block; }
+  .adviser-hero__portraits strong { color: #fffaf0; font: clamp(1.15rem, 2.1vw, 1.65rem)/1.2 Georgia, serif; }
+  .adviser-hero__portraits span { color: #d3e3d9; font-size: .87rem; line-height: 1.4; margin-top: .25rem; }
+  @media (max-width: 52rem) {
     .adviser-hero { grid-template-columns: 1fr; }
-    .adviser-hero__copy { padding: 2rem 1.4rem; }
-    .adviser-hero h1 { font-size: clamp(3rem, 12vw, 4.5rem); }
-    .adviser-hero__portrait { min-height: 0; aspect-ratio: 1.55; }
-    .adviser-hero__portrait img { object-position: center 17%; }
-    .adviser-hero__portrait figcaption { padding: 2rem 1.4rem .85rem; }
+    .adviser-hero__copy { padding: 1.5rem 1.25rem; }
+    .adviser-hero .adviser-hero__eyebrow { margin-bottom: .65rem; }
+    .adviser-hero h1 { font-size: clamp(2.8rem, 9vw, 4rem); }
+    .adviser-hero .adviser-hero__intro { max-width: 42ch; margin-top: 1rem; font-size: 1rem; }
+    .adviser-hero__actions { margin-top: 1rem; gap: .65rem 1rem; }
+    .adviser-hero__portraits { padding: 0 1.25rem 1.4rem; }
+    .adviser-hero__photo { aspect-ratio: 1 / 1.06; }
   }
 </style>
