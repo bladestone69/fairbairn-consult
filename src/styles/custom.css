@@ -44,14 +44,19 @@ html { scroll-padding-top: 1.25rem; }
 .advice-options p { margin: .8rem 0 0; font-size: 1rem; }
 .adviser-profiles { padding: clamp(1.25rem, 3.5vw, 2.75rem); background: #e9eee3; border-radius: .7rem; }
 .adviser-profiles__columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(1.75rem, 4vw, 3.5rem); }
-.adviser-profiles article { margin: 0; padding-top: 1.1rem; border-top: 1px solid #a4b7aa; }
+.adviser-profiles article { display: flex; flex-direction: column; margin: 0; padding-top: 1.1rem; border-top: 1px solid #a4b7aa; }
 .adviser-profiles article h3 { margin: 0; font-size: 1.65rem; font-weight: 400; }
-.adviser-profiles article p, .adviser-profiles blockquote, .adviser-profiles dl { margin: .85rem 0 0; }
+.adviser-profiles article p, .adviser-profiles blockquote { margin: .85rem 0 0; }
+.adviser-profiles article > p:last-child { margin-top: auto; padding-top: .85rem; }
 .adviser-profiles blockquote { border: 0; padding: 0; }
 .adviser-profiles small { display: block; margin-top: 1rem; }
-.adviser-profiles dl { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .25rem .8rem; }
-.adviser-profiles dt { margin: 0; font-weight: 650; }
-.adviser-profiles dd { margin: 0; overflow-wrap: anywhere; }
+.adviser-bio { display: grid; grid-template-columns: minmax(10rem, 15rem) minmax(0, 62ch); align-items: start; gap: clamp(1.5rem, 4vw, 3rem); }
+.adviser-bio img { width: 100%; height: auto; border-radius: .6rem; }
+.adviser-bio > div, .adviser-bio p:first-child { margin-top: 0; }
+.sl-markdown-content .adviser-bio h2 { margin-top: 1.5rem; }
+.adviser-bio dl { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .25rem .8rem; }
+.adviser-bio dt { margin: 0; font-weight: 650; }
+.adviser-bio dd { margin: 0; overflow-wrap: anywhere; }
 .first-call { display: flex; align-items: center; justify-content: space-between; gap: 2rem; }
 .first-call p { max-width: 43ch; }
 .first-call .home-button { flex-shrink: 0; color: white; }
@@ -98,7 +103,8 @@ html { scroll-padding-top: 1.25rem; }
   .public-nav { gap: .45rem; padding: .8rem 1rem; }
   .public-nav__mark { display: none; }
   .nav-callback { font-size: .9rem; padding: .65rem .75rem; }
-  .contact-layout, .adviser-profiles__columns { grid-template-columns: minmax(0, 1fr); }
+  .contact-layout, .adviser-profiles__columns, .adviser-bio { grid-template-columns: minmax(0, 1fr); }
+  .adviser-bio img { max-width: 12rem; }
   .first-call { flex-direction: column; align-items: flex-start; gap: 1rem; }
   .first-call .home-button { margin-top: 0; }
   .advice-options { grid-template-columns: 1fr; }
