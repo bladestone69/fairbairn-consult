@@ -61,19 +61,41 @@ const rows = [
 </section>
 
 <style>
+  #retirement-tax-benefit, #retirement-tax-benefit .calculator-shell {
+    padding: clamp(.75rem, 2vw, 1.4rem);
+  }
+  .section-intro h2 {
+    margin-block-start: .5rem;
+    font-size: clamp(1.35rem, 2.2vw, 1.65rem);
+    line-height: 1.25;
+  }
+  #retirement-tax-benefit .calculator-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13.5rem), 1fr));
+    align-items: end;
+  }
+  .calculator-grid label { min-width: 0; margin: 0; font-size: .9rem; line-height: 1.4; }
+  .calculator-grid :is(input, select) { min-width: 0; width: 100%; }
+  #retirement-tax-benefit .calculator-result {
+    container-type: inline-size;
+    grid-template-columns: minmax(0, 1fr);
+    gap: .5rem;
+    padding: clamp(.55rem, 1.5vw, 1rem);
+  }
   .result-row {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: .75rem;
     padding: .75rem;
+    margin: 0;
     border-radius: .5rem;
   }
   .result-row.highlight { background: var(--sl-color-bg-hover); border: 1px solid var(--sl-color-hairline); }
-  .result-label { font-size: .9rem; }
-  .result-value { font-size: 1.05rem; font-variant-numeric: tabular-nums; }
+  .result-row > div { min-width: 0; margin: 0; overflow-wrap: anywhere; }
+  .result-label, .meta { font-size: .875rem; line-height: 1.45; }
+  .result-value { font-size: 1rem; line-height: 1.35; font-variant-numeric: tabular-nums; }
   [data-input-error]:empty { display: none; }
-  @media (max-width: 640px) {
-    .result-row { grid-template-columns: 1fr; }
+  @container (max-width: 28rem) {
+    .result-row { grid-template-columns: minmax(0, 1fr); }
   }
 </style>
 
