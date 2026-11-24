@@ -46,6 +46,20 @@ html { scroll-padding-top: 1.25rem; }
 .adviser-story p:first-child { margin: 0 0 1rem; }
 .section-label, .adviser-story a { font-size: 1rem; font-weight: 650; }
 .adviser-story small { display: block; font-size: .9rem; margin-top: 1rem; }
+.colleague-profile { display: grid; grid-template-columns: minmax(10rem, 15rem) minmax(0, 1fr); align-items: start; gap: clamp(1.5rem, 4vw, 3rem); margin-block: clamp(2.5rem, 6vw, 5rem); }
+.colleague-profile > img { width: 100%; height: auto; border-radius: .6rem; }
+.sl-markdown-content .colleague-profile h2 { margin: 0; font-size: clamp(2rem, 3.5vw, 3.25rem); line-height: 1.12; font-weight: 400; }
+.colleague-profile .colleague-role { margin: .4rem 0 1.2rem; font-weight: 600; }
+.colleague-profile blockquote { max-width: 65ch; margin: 0; padding-inline-start: 1rem; border-inline-start: 2px solid #a2b5a6; }
+.colleague-profile blockquote p { margin: 0; }
+.colleague-profile blockquote p + p { margin-top: .75rem; }
+.colleague-profile dl { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .25rem 1rem; margin-top: 1.25rem; }
+.colleague-profile dt { font-weight: 650; }
+.colleague-profile dd { margin: 0; overflow-wrap: anywhere; }
+@media (max-width: 42rem) {
+  .colleague-profile { grid-template-columns: 1fr; }
+  .colleague-profile > img { max-width: 12rem; }
+}
 .first-call { display: flex; align-items: center; justify-content: space-between; gap: 2rem; }
 .first-call p { max-width: 43ch; }
 .first-call .home-button { flex-shrink: 0; color: white; }
